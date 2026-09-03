@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>SQLite Bookmark Manager</title>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.13.0/sql-wasm.js"></script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 30px auto;
+        }
+
+        input {
+            padding: 8px;
+            margin: 5px;
+            width: 250px;
+        }
+
+        button {
+            padding: 8px;
+        }
+
+        .bookmark {
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+
+<h1>SQLite Bookmark Manager</h1>
+
+<input id="title" placeholder="Title">
+<input id="url" placeholder="URL">
+<button onclick="addBookmark()">Add</button>
+
+<hr>
+
+<div id="results"></div>
+
+<script>
+
+let db;
+
+async function initDB() {
+
+    const SQL = await initSqlJs({
+        locateFile: file =>
+        "https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.13.0/" + file
+    });
+
+    db = new SQL.Database();
+
+    db.run(`
+        CREATE TABLE bookmarks (
+            id INTEGER PRIMARY KEY,
+            title TEXT,
+            url TEXT
+        );
+    `);
+
+    refresh();
+}
+
+function addBookmark() {
+
+    const title = document.getElementById("title").value;
+    const url = document.getElementById("url").value;
+
+    const stmt = db.prepare(
+        "INSERT INTO bookmarks (title, url) VALUES (?, ?)"
+    );
+
+    stmt.run([title, url]);
+    stmt.free();
+
+    document.getElementById("title").value = "";
+    document.getElementById("url").value = "";
+
+    refresh();
+}
+
+function deleteBookmark(id) {
+
+    db.run(
+        "DELETE FROM bookmarks WHERE id = ?",
+        [id]
+    );
+
+    refresh();
+}
+
+function refresh() {
+
+    const result =
+        db.exec("SELECT * FROM bookmarks ORDER BY id");
+
+    const div = document.getElementById("results");
+
+    if(result.length === 0) {
+        div.innerHTML = "<p>No bookmarks yet.</p>";
+        return;
+    }
+
+    const rows = result[0].values;
+
+    let html = "";
+
+    rows.forEach(row => {
+
+        html += `
+            <div class="bookmark">
+                ${row[2]}
+                    ${row[1]}
+                </a>
+                <button onclick="deleteBookmark(${row[0]})">
+                    Delete
+                </button>
+            </div>
+        `;
+    });
+
+    div.innerHTML = html;
+}
+
+initDB();
+
+</script>
+
+</body>
+</html>

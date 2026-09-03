@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Outdoors in Herts</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.13.0/sql-wasm.js"></script>
+    <style>
+      :root {
+        --bg: #f4f7f1;
+        --panel: #ffffff;
+        --text: #1f2937;
+        --muted: #6b7280;
+        --border: #dfe7d7;
+        --green: #2f7d4a;
+        --green-soft: #eaf5ee;
+        --blue: #1d4ed8;
+        --blue-soft: #e0ebff;
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        font-family: Arial, Helvetica, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.6;
+      }
+
+      main {
+        max-width: 1100px;
+        margin: 32px auto;
+        padding: 0 20px 40px;
+      }
+
+      h1 {
+        margin: 0 0 12px;
+        font-size: 2.1rem;
+      }
+
+      .subtitle {
+        color: var(--muted);
+        margin-bottom: 22px;
+      }
+
+      .filter-panel {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 16px 18px;
+        margin-bottom: 24px;
+      }
+
+      .filter-panel h2 {
+        margin: 0 0 12px;
+        font-size: 1.1rem;
+      }
+
+      .filter-group {
+        margin-bottom: 14px;
+      }
+
+      .filter-group:last-child {
+        margin-bottom: 0;
+      }
+
+      .filter-label {
+        display: block;
+        font-weight: 700;
+        margin-bottom: 8px;
+      }
+
+      .filter-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .filter-link {
+        display: inline-block;
+        border: 1px solid var(--border);
+        background: var(--green-soft);
+        color: var(--green);
+        border-radius: 999px;
+        padding: 6px 10px;
+        text-decoration: none;
+        font-size: 0.9rem;
+        cursor: pointer;
+      }
+
+      .filter-link.active {
+        background: var(--green);
+        color: white;
+        border-color: var(--green);
+      }
+
+      .filter-link.tag {
+        background: var(--blue-soft);
+        color: var(--blue);
+        border-color: #bfd4ff;
+      }
+
+      .filter-link.tag.active {
+        background: var(--blue);
+        color: white;
+        border-color: var(--blue);
+      }
+
+      .post {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 22px 24px;
+        margin-bottom: 20px;
+      }
+
+      .post h2 {
+        margin-top: 0;
+        margin-bottom: 6px;
+        font-size: 1.85rem;
+      }
+
+      .post-meta {
+        color: var(--muted);
+        font-size: 0.9rem;
+        margin-bottom: 16px;
+      }
+
+      .post-content p {
+        margin: 0 0 1em;
+      }
+
+      .post-content img {
+        display: block;
+        max-width: 100%;
+        height: auto;
+        border-radius: 10px;
+        border: 1px solid var(--border);
+        margin: 10px 0;
+      }
+
+      .post-content figure {
+        margin: 20px 0;
+      }
+
+      .empty {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 20px 24px;
+        color: var(--muted);
+      }
+
+      .error {
+        background: #fff2f2;
+        border: 1px solid #fecaca;
+        color: #991b1b;
+        border-radius: 10px;
+        padding: 16px 18px;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Outdoors in Herts</h1>
+      <div class="subtitle">Browse all posts and filter by category or tag.</div>
+
+      <section class="filter-panel">
+        <h2>Filter posts</h2>
+        <div id="filter-controls"></div>
+      </section>
+
+      <div id="posts"></div>
+    </main>
+
+    <script src="./jsimport.js?v=2026-09-03"></script>
+    <script>
+      const uiState = {
+        selectedFilter: { kind: 'category', name: 'ALL' }
+      };
+
+      function escapeHtml(value) {
+        return String(value || '')
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/\"/g, '&quot;')
+          .replace(/'/g, '&#39;');
+      }
+
+      function formatDate(dateString) {
+        if (!dateString) return '';
+        const date = new Date(dateString.replace(' ', 'T'));
+        if (Number.isNaN(date.getTime())) return dateString;
+        return date.toLocaleDateString(undefined, {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        });
+      }
+
+      function renderFilters(terms) {
+        const container = document.getElementById('filter-controls');
+        const groups = { category: [], tag: [] };
+
+        terms.forEach((term) => {
+          if (term.kind === 'category') groups.category.push(term);
+          if (term.kind === 'tag') groups.tag.push(term);
+        });
+
+        const buildFilterButtons = (kind, list) => {
+          const buttons = [
+            `<a class="filter-link ${kind === 'category' ? '' : 'tag'} ${uiState.selectedFilter && uiState.selectedFilter.kind === kind && uiState.selectedFilter.name === 'ALL' ? 'active' : ''}" href="#" data-kind="${kind}" data-name="ALL">All ${kind === 'category' ? 'categories' : 'tags'}</a>`
+          ];
+
+          list.forEach((term) => {
+            const isActive = uiState.selectedFilter && uiState.selectedFilter.kind === kind && uiState.selectedFilter.name === term.name;
+            buttons.push(
+              `<a class="filter-link ${kind === 'category' ? '' : 'tag'} ${isActive ? 'active' : ''}" href="#" data-kind="${kind}" data-name="${escapeHtml(term.name)}">${escapeHtml(term.name)} (${term.count})</a>`
+            );
+          });
+
+          return buttons.join('');
+        };
+
+        container.innerHTML = `
+          <div class="filter-group">
+            <span class="filter-label">Categories</span>
+            <div class="filter-list">${buildFilterButtons('category', groups.category)}</div>
+          </div>
+          <div class="filter-group">
+            <span class="filter-label">Tags</span>
+            <div class="filter-list">${buildFilterButtons('tag', groups.tag)}</div>
+          </div>
+        `;
+
+        container.querySelectorAll('.filter-link').forEach((link) => {
+          link.addEventListener('click', (event) => {
+            event.preventDefault();
+            const kind = link.getAttribute('data-kind');
+            const name = link.getAttribute('data-name');
+            uiState.selectedFilter = { kind, name };
+            renderFilters(window.wordpressImport.getAllTerms().map((term) => ({
+              ...term,
+              count: getTermCount(term.kind, term.term_id)
+            })));
+            renderPosts();
+          });
+        });
+      }
+
+      function getTermCount(kind, termId) {
+        const db = window.wordpressImport && window.wordpressImport.getDb ? window.wordpressImport.getDb() : null;
+        if (!db) return 0;
+
+        const result = db.exec(`
+          SELECT COUNT(*) as count
+          FROM post_terms
+          WHERE kind = ? AND term_id = ?
+        `, [kind, termId]);
+        return Number(result[0].values[0][0] || 0);
+      }
+
+      function renderPosts() {
+        const container = document.getElementById('posts');
+        const db = window.wordpressImport && window.wordpressImport.getDb ? window.wordpressImport.getDb() : null;
+
+        if (!db) {
+          container.innerHTML = '<div class="empty">Loading posts...</div>';
+          return;
+        }
+
+        let sql = `
+          SELECT p.id, p.title, p.link, p.date, p.content, p.excerpt, p.status, p.post_name
+          FROM posts p
+        `;
+        let params = [];
+
+        if (uiState.selectedFilter && uiState.selectedFilter.name !== 'ALL') {
+          sql += `
+            INNER JOIN post_terms pt ON pt.post_id = p.id
+            INNER JOIN terms t ON t.term_id = pt.term_id AND t.kind = pt.kind
+            WHERE t.kind = ? AND t.name = ?
+          `;
+          params = [uiState.selectedFilter.kind, uiState.selectedFilter.name];
+        }
+
+        sql += ` ORDER BY p.row_order ASC`;
+
+        const result = db.exec(sql, params);
+        const rows = result && result[0] ? result[0].values : [];
+
+        if (!rows.length) {
+          container.innerHTML = '<div class="empty">No posts match this filter.</div>';
+          return;
+        }
+
+        const columns = result[0].columns;
+        const posts = rows.map((row) => {
+          const obj = {};
+          columns.forEach((col, idx) => {
+            obj[col] = row[idx];
+          });
+          return obj;
+        });
+
+        container.innerHTML = posts.map((post) => {
+          const title = post.title || 'Untitled post';
+          const content = post.content && post.content.trim() ? post.content : (post.excerpt || '<p>No content available.</p>');
+          return `
+            <article class="post">
+              <h2>${escapeHtml(title)}</h2>
+              <div class="post-meta">Published: ${escapeHtml(formatDate(post.date))}</div>
+              <div class="post-content">${content}</div>
+            </article>
+          `;
+        }).join('');
+      }
+
+      async function startApp() {
+        const postsContainer = document.getElementById('posts');
+        const filterContainer = document.getElementById('filter-controls');
+
+        if (postsContainer) {
+          postsContainer.innerHTML = '<div class="empty">Loading posts...</div>';
+        }
+
+        try {
+          if (!window.wordpressImport || typeof window.wordpressImport.initializeDatabase !== 'function') {
+            throw new Error('The WordPress import module is not available yet.');
+          }
+
+          const importState = await window.wordpressImport.initializeDatabase();
+          uiState.selectedFilter = { kind: 'category', name: 'ALL' };
+
+          const terms = importState.terms.map((term) => ({
+            ...term,
+            count: getTermCount(term.kind, term.term_id)
+          }));
+
+          renderFilters(terms);
+          renderPosts();
+        } catch (error) {
+          console.error(error);
+          if (postsContainer) {
+            postsContainer.innerHTML = `
+              <div class="error">
+                The WordPress export could not be loaded. Please confirm the file is present and served from the same folder as this page.
+              </div>
+            `;
+          }
+          if (filterContainer) {
+            filterContainer.innerHTML = '';
+          }
+        }
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', startApp, { once: true });
+      } else {
+        startApp();
+      }
+    </script>
+  </body>
+</html>

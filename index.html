@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WordPress Posts</title>
+    <style>
+      :root {
+        --bg: #f5f7fb;
+        --card: #ffffff;
+        --text: #1f2937;
+        --muted: #6b7280;
+        --border: #e5e7eb;
+        --accent: #2563eb;
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        font-family: Arial, Helvetica, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.6;
+      }
+
+      main {
+        max-width: 980px;
+        margin: 32px auto;
+        padding: 0 20px 40px;
+      }
+
+      h1 {
+        margin: 0 0 24px;
+        font-size: 2rem;
+      }
+
+      .post {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 24px;
+        margin-bottom: 24px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+      }
+
+      .post h2 {
+        margin-top: 0;
+        margin-bottom: 8px;
+        font-size: 1.8rem;
+      }
+
+      .meta {
+        color: var(--muted);
+        font-size: 0.9rem;
+        margin-bottom: 16px;
+      }
+
+      .post-content p {
+        margin: 0 0 1em;
+      }
+
+      .post-content figure {
+        margin: 20px 0;
+      }
+
+      .post-content img {
+        display: block;
+        max-width: 100%;
+        height: auto;
+        border-radius: 10px;
+        border: 1px solid var(--border);
+      }
+
+      .error {
+        background: #fff1f2;
+        border: 1px solid #fecdd3;
+        color: #9f1239;
+        padding: 12px 16px;
+        border-radius: 8px;
+      }
+
+      .meta-summary {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 20px 24px;
+        margin: 0 0 24px;
+      }
+
+      .meta-summary h2 {
+        margin: 0 0 12px;
+        font-size: 1.25rem;
+      }
+
+      .meta-group {
+        margin-bottom: 16px;
+      }
+
+      .meta-group:last-child {
+        margin-bottom: 0;
+      }
+
+      .meta-group-label {
+        display: block;
+        font-weight: 700;
+        margin-bottom: 8px;
+      }
+
+      .chip-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .chip {
+        display: inline-block;
+        background: #eff6ff;
+        color: #1d4ed8;
+        border: 1px solid #bfdbfe;
+        border-radius: 999px;
+        padding: 4px 10px;
+        font-size: 0.9rem;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>WordPress Posts</h1>
+      <section class="meta-summary">
+        <h2>Post metadata</h2>
+        <div id="metadata"></div>
+      </section>
+      <div id="posts"></div>
+    </main>
+
+    <script>
+      function escapeHtml(value) {
+        return String(value)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;');
+      }
+
+      function renderMetadata(posts) {
+        const metadataContainer = document.getElementById('metadata');
+        const categorySet = new Set();
+        const tagSet = new Set();
+
+        posts.forEach((post) => {
+          if (Array.isArray(post.categories)) {
+            post.categories.forEach((value) => categorySet.add(String(value)));
+          }
+
+          if (Array.isArray(post.tags)) {
+            post.tags.forEach((value) => tagSet.add(String(value)));
+          }
+        });
+
+        const categories = Array.from(categorySet).sort((a, b) => Number(a) - Number(b));
+        const tags = Array.from(tagSet).sort((a, b) => Number(a) - Number(b));
+
+        metadataContainer.innerHTML = `
+          <div class="meta-group">
+            <span class="meta-group-label">Categories (${categories.length})</span>
+            <div class="chip-list">
+              ${categories.length ? categories.map((value) => `<span class="chip">${escapeHtml(value)}</span>`).join('') : '<span class="chip">None</span>'}
+            </div>
+          </div>
+          <div class="meta-group">
+            <span class="meta-group-label">Tags (${tags.length})</span>
+            <div class="chip-list">
+              ${tags.length ? tags.map((value) => `<span class="chip">${escapeHtml(value)}</span>`).join('') : '<span class="chip">None</span>'}
+            </div>
+          </div>
+        `;
+      }
+
+      async function loadPosts() {
+        const container = document.getElementById('posts');
+
+        try {
+          const response = await fetch('./site1.json');
+          if (!response.ok) throw new Error('site1.json could not be loaded');
+          const posts = await response.json();
+
+          if (!Array.isArray(posts) || posts.length === 0) {
+            container.innerHTML = '<div class="error">No posts were found in site1.json.</div>';
+            return;
+          }
+
+          renderMetadata(posts);
+
+          posts.forEach((post) => {
+            const contentHtml = post.content && post.content.rendered ? post.content.rendered : '';
+            const article = document.createElement('article');
+            article.className = 'post';
+
+            const published = post.date ? new Date(post.date).toLocaleDateString(undefined, {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric'
+            }) : 'Unknown date';
+
+            article.innerHTML = `
+              <h2>${escapeHtml(post.title && post.title.rendered ? post.title.rendered : 'Untitled post')}</h2>
+              <div class="meta">Published: ${escapeHtml(published)}</div>
+              <div class="post-content">${contentHtml || '<p>No content available.</p>'}</div>
+            `;
+
+            container.appendChild(article);
+          });
+        } catch (error) {
+          console.error(error);
+          container.innerHTML = `
+            <div class="error">
+              Unable to load the JSON file. Please serve this folder with a local web server, for example:<br />
+              <code>python -m http.server 8000</code><br />
+              then open <code>http://localhost:8000/</code>
+            </div>
+          `;
+        }
+      }
+
+      loadPosts();
+    </script>
+  </body>
+</html>

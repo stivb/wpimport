@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Outdoors in Herts Starter</title>
+    <style>
+      :root {
+        --bg: #f6f7f2;
+        --panel: #ffffff;
+        --text: #1f2937;
+        --muted: #5b6472;
+        --border: #dde6d6;
+        --green: #2f7d4a;
+        --green-soft: #ebf6ee;
+        --blue: #1d4ed8;
+        --blue-soft: #e7efff;
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        font-family: Arial, Helvetica, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.5;
+      }
+
+      main {
+        max-width: 1100px;
+        margin: 32px auto;
+        padding: 0 20px 40px;
+      }
+
+      h1 {
+        margin: 0 0 10px;
+        font-size: 2.1rem;
+      }
+
+      .subtitle {
+        color: var(--muted);
+        margin-bottom: 22px;
+      }
+
+      .terms-wrap {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 18px;
+        margin-bottom: 22px;
+      }
+
+      .panel {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 16px 18px;
+      }
+
+      .panel h2 {
+        margin: 0 0 10px;
+        font-size: 1.05rem;
+      }
+
+      .term-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .term-button {
+        border: 1px solid var(--border);
+        background: var(--green-soft);
+        color: var(--green);
+        border-radius: 999px;
+        padding: 6px 10px;
+        font-size: 0.9rem;
+        cursor: pointer;
+      }
+
+      .term-button.tag {
+        background: var(--blue-soft);
+        color: var(--blue);
+      }
+
+      .sql-box {
+        display: grid;
+        gap: 12px;
+      }
+
+      textarea {
+        width: 100%;
+        min-height: 180px;
+        font-family: Consolas, Monaco, monospace;
+        font-size: 0.92rem;
+        padding: 14px 16px;
+        border-radius: 10px;
+        border: 1px solid var(--border);
+        resize: vertical;
+      }
+
+      button {
+        background: var(--green);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 10px 16px;
+        font-size: 0.96rem;
+        cursor: pointer;
+      }
+
+      .results {
+        background: #111827;
+        color: #e5e7eb;
+        border-radius: 10px;
+        padding: 14px 16px;
+        min-height: 220px;
+        white-space: pre-wrap;
+        overflow: auto;
+        font-family: Consolas, Monaco, monospace;
+        font-size: 0.9rem;
+      }
+
+      .status {
+        color: var(--muted);
+        font-size: 0.92rem;
+        margin-top: 4px;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Outdoors in Herts</h1>
+      <div class="subtitle">Browse the imported posts and test SQL queries against the in-browser database.</div>
+
+      <div class="terms-wrap">
+        <div class="panel">
+          <h2>Categories</h2>
+          <div id="categories" class="term-list"></div>
+        </div>
+
+        <div class="panel">
+          <h2>Tags</h2>
+          <div id="tags" class="term-list"></div>
+        </div>
+      </div>
+
+      <div class="panel sql-box">
+        <h2>SQL query</h2>
+        <textarea id="sql-input">SELECT p.title, p.date, p.link, t.name AS category_name
+FROM posts p
+LEFT JOIN post_terms pt ON pt.post_id = p.id AND pt.kind = 'category'
+LEFT JOIN terms t ON t.term_id = pt.term_id AND t.kind = 'category'
+ORDER BY p.row_order ASC
+LIMIT 10;</textarea>
+        <div>
+          <button id="run-query">Run query</button>
+        </div>
+        <div class="status" id="query-status">Ready.</div>
+        <pre id="results" class="results"></pre>
+      </div>
+    </main>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.13.0/sql-wasm.js"></script>
+    <script src="./jsimport.js"></script>
+    <script>
+      const state = {
+        db: null,
+        terms: []
+      };
+
+      function escapeHtml(value) {
+        return String(value || '')
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;');
+      }
+
+      function formatValue(value) {
+        if (value === null || value === undefined) return '';
+        return String(value).trim();
+      }
+
+      function renderTerms() {
+        const categories = document.getElementById('categories');
+        const tags = document.getElementById('tags');
+        categories.innerHTML = '';
+        tags.innerHTML = '';
+
+        const groups = { category: [], tag: [] };
+        state.terms.forEach((term) => {
+          if (term.kind === 'category') groups.category.push(term);
+          if (term.kind === 'tag') groups.tag.push(term);
+        });
+
+        const addButtons = (kind, container, list) => {
+          const buttonList = [
+            '<button class="term-button ' + (kind === 'tag' ? 'tag' : '') + '" data-kind="' + kind + '" data-name="ALL">All ' + (kind === 'tag' ? 'tags' : 'categories') + '</button>'
+          ];
+
+          list.forEach((term) => {
+            buttonList.push(
+              '<button class="term-button ' + (kind === 'tag' ? 'tag' : '') + '" data-kind="' + kind + '" data-name="' + escapeHtml(term.name) + '">' + escapeHtml(term.name) + ' (' + term.count + ')</button>'
+            );
+          });
+
+          container.innerHTML = buttonList.join('');
+          container.querySelectorAll('button').forEach((button) => {
+            button.addEventListener('click', () => {
+              const kind = button.dataset.kind;
+              const name = button.dataset.name;
+              const query = buildTermQuery(kind, name);
+              document.getElementById('sql-input').value = query;
+              runSqlQuery(query);
+            });
+          });
+        };
+
+        addButtons('category', categories, groups.category);
+        addButtons('tag', tags, groups.tag);
+      }
+
+      function buildTermQuery(kind, name) {
+        const cleanName = String(name || 'ALL').replace(/'/g, "''");
+
+        if (cleanName === 'ALL') {
+          return `SELECT p.id, p.title, p.date, p.link
+FROM posts p
+ORDER BY p.row_order ASC
+LIMIT 10;`;
+        }
+
+        return `SELECT p.id, p.title, p.date, p.link, t.name AS ${kind}_name
+FROM posts p
+INNER JOIN post_terms pt ON pt.post_id = p.id AND pt.kind = '${kind}'
+INNER JOIN terms t ON t.term_id = pt.term_id AND t.kind = '${kind}'
+WHERE t.name = '${cleanName}'
+ORDER BY p.row_order ASC;`;
+      }
+
+      function formatResults(result) {
+        if (!result || !result.length) {
+          return 'No rows returned.';
+        }
+
+        const columns = result[0].columns || [];
+        const rows = result[0].values || [];
+
+        if (!columns.length || !rows.length) {
+          return 'No rows returned.';
+        }
+
+        const header = columns.map((col) => String(col)).join(' | ');
+        const lines = rows.map((row) => row.map((value) => formatValue(value)).join(' | '));
+        return [header, '-'.repeat(Math.max(80, header.length)), ...lines].join('\n');
+      }
+
+      function runSqlQuery(sqlText) {
+        const statusEl = document.getElementById('query-status');
+        const resultsEl = document.getElementById('results');
+
+        try {
+          const trimmed = String(sqlText || '').trim();
+          if (!trimmed) {
+            statusEl.textContent = 'Please enter a SQL query.';
+            resultsEl.textContent = 'No query supplied.';
+            return;
+          }
+
+          const result = state.db.exec(trimmed);
+          if (!result.length) {
+            statusEl.textContent = 'Query executed successfully.';
+            resultsEl.textContent = 'No rows returned.';
+            return;
+          }
+
+          statusEl.textContent = 'Query executed successfully.';
+          resultsEl.textContent = formatResults(result);
+        } catch (error) {
+          statusEl.textContent = 'Query error.';
+          resultsEl.textContent = String(error && (error.message || error));
+        }
+      }
+
+      async function startApp() {
+        const importApi = window.wordpressImport;
+        if (!importApi || typeof importApi.initializeDatabase !== 'function') {
+          document.getElementById('results').textContent = 'The WordPress import module is not available.';
+          return;
+        }
+
+        const importState = await importApi.initializeDatabase();
+        state.db = importState.dbInstance;
+        state.terms = importState.terms;
+        renderTerms();
+        runSqlQuery(document.getElementById('sql-input').value);
+      }
+
+      document.getElementById('run-query').addEventListener('click', () => {
+        runSqlQuery(document.getElementById('sql-input').value);
+      });
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', startApp, { once: true });
+      } else {
+        startApp();
+      }
+    </script>
+  </body>
+</html>

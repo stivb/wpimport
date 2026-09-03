@@ -1,0 +1,494 @@
+[
+  {
+    "id": 13,
+    "count": 0,
+    "description": "",
+    "link": "http://testing.local/category/regions/broxbourne/",
+    "name": "Broxbourne",
+    "slug": "broxbourne",
+    "taxonomy": "category",
+    "parent": 4,
+    "meta": [],
+    "_links": {
+      "self": [
+        {
+          "href": "http://testing.local/wp-json/wp/v2/categories/13",
+          "targetHints": {
+            "allow": [
+              "GET"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "http://testing.local/wp-json/wp/v2/categories"
+        }
+      ],
+      "about": [
+        {
+          "href": "http://testing.local/wp-json/wp/v2/taxonomies/category"
+        }
+      ],
+      "up": [
+        {
+          "embeddable": true,
+          "href": "http://testing.local/wp-json/wp/v2/categories/4"
+        }
+      ],
+      "wp:post_type": [
+        {
+          "href": "http://testing.local/wp-json/wp/v2/posts?categories=13"
+        }
+      ],
+      "curies": [
+        {
+          "name": "wp",
+          "href": "https://api.w.org/{rel}",
+          "templated": true
+        }
+      ]
+    }
+  },
+  {
+    "id": 14,
+    "count": 2,
+    "description": "",
+    "link": "http://testing.local/category/regions/dacorum/",
+    "name": "Dacorum",
+    "slug": "dacorum",
+    "taxonomy": "category",
+    "parent": 4,
+    "meta": [],
+    "_links": {
+      "self": [
+        {
+          "href": "http://testing.local/wp-json/wp/v2/categories/14",
+          "targetHints": {
+            "allow": [
+              "GET"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "http://testing.local/wp-json/wp/v2/categories"
+        }
+      ],
+      "about": [
+        {
+          "href": "http://testing.local/wp-json/wp/v2/taxonomies/category"
+        }
+      ],
+      "up": [
+        {
+          "embeddable": true,
+          "href": "http://testing.local/wp-json/wp/v2/categories/4"
+        }
+      ],
+      "wp:post_type": [
+        {
+          "href": "http://testing.local/wp-json/wp/v2/posts?categories=14"
+        }
+      ],
+      "curies": [
+        {
+          "name": "wp",
+          "href": "https://api.w.org/{rel}",
+          "templated": true
+        }
+      ]
+    }
+  },
+  {
+    "id": 15,
+    "count": 0,
+    "description": "",
+    "link": "http://testing.local/category/regions/east-hertfordshire/",
+    "name": "East Hertfordshire",
+    "slug": "east-hertfordshire",
+    "taxonomy": "category",
+    "parent": 4,
+    "meta": [],
+    "_links": {
+      "self": [
+        {
+          "href": "http://testing.local/wp-json/wp/v2/categories/15",
+          "targetHints": {
+            "allow": [
+              "GET"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "http://testing.local/wp-json/wp/v2/categories"
+        }
+      ],
+      "about": [
+        {
+          "href": "http://testing.local/wp-json/wp/v2/taxonomies/category"
+        }
+      ],
+      "up": [
+        {
+          "embeddable": true,
+          "href": "http://testing.local/wp-json/wp/v2/categories/4"
+        }
+      ],
+      "wp:post_type": [
+        {
+          "href": "http://testing.local/wp-json/wp/v2/posts?categories=15"
+        }
+      ],
+      "curies": [
+        {
+          "name": "wp",
+          "href": "https://api.w.org/{rel}",
+          "templated": true
+        }
+      ]
+    }
+  },
+  {
+    "id": 16,
+    "count": 0,
+    "description": "",
+    "link": "http://testing.local/category/regions/hertsmere/",
+    "name": "Hertsmere",
+    "slug": "hertsmere",
+    "taxonomy": "category",
+    "parent": 4,
+    "meta": [],
+    "_links": {
+      "self": [
+        {
+          "href": "http://testing.local/wp-json/wp/v2/categories/16",
+          "targetHints": {
+            "allow": [
+              "GET"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "http://testing.local/wp-json/wp/v2/categories"
+        }
+      ],
+      "about": [
+        {
+          "href": "http://testing.local/wp-json/wp/v2/taxonomies/category"
+        }
+      ],
+      "up": [
+        {
+          "embeddable": true,
+          "href": "http://testing.local/wp-json/wp/v2/categories/4"
+        }
+      ],
+      "wp:post_type": [
+        {
+          "href": "http://testing.local/wp-json/wp/v2/posts?categories=16"
+        }
+      ],
+      "curies": [
+        {
+          "name": "wp",
+          "href": "https://api.w.org/{rel}",
+          "templated": true
+        }
+      ]
+    }
+  },
+  {
+    "id": 17,
+    "count": 0,
+    "description": "",
+    "link": "http://testing.local/category/walking/hills/",
+    "name": "Hills",
+    "slug": "hills",
+    "taxonomy": "category",
+    "parent": 8,
+    "meta": [],
+    "_links": {
+      "self": [
+        {
+          "href": "http://testing.local/wp-json/wp/v2/categories/17",
+          "targetHints": {
+            "allow": [
+              "GET"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "http://testing.local/wp-json/wp/v2/categories"
+        }
+      ],
+      "about": [
+        {
+          "href": "http://testing.local/wp-json/wp/v2/taxonomies/category"
+        }
+      ],
+      "up": [
+        {
+          "embeddable": true,
+          "href": "http://testing.local/wp-json/wp/v2/categories/8"
+        }
+      ],
+      "wp:post_type": [
+        {
+          "href": "http://testing.local/wp-json/wp/v2/posts?categories=17"
+        }
+      ],
+      "curies": [
+        {
+          "name": "wp",
+          "href": "https://api.w.org/{rel}",
+          "templated": true
+        }
+      ]
+    }
+  },
+  {
+    "id": 2,
+    "count": 0,
+    "description": "",
+    "link": "http://testing.local/category/kids/",
+    "name": "Kids",
+    "slug": "kids",
+    "taxonomy": "category",
+    "parent": 0,
+    "meta": [],
+    "_links": {
+      "self": [
+        {
+          "href": "http://testing.local/wp-json/wp/v2/categories/2",
+          "targetHints": {
+            "allow": [
+              "GET"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "http://testing.local/wp-json/wp/v2/categories"
+        }
+      ],
+      "about": [
+        {
+          "href": "http://testing.local/wp-json/wp/v2/taxonomies/category"
+        }
+      ],
+      "wp:post_type": [
+        {
+          "href": "http://testing.local/wp-json/wp/v2/posts?categories=2"
+        }
+      ],
+      "curies": [
+        {
+          "name": "wp",
+          "href": "https://api.w.org/{rel}",
+          "templated": true
+        }
+      ]
+    }
+  },
+  {
+    "id": 18,
+    "count": 0,
+    "description": "",
+    "link": "http://testing.local/category/regions/north-hertfordshire/",
+    "name": "North Hertfordshire",
+    "slug": "north-hertfordshire",
+    "taxonomy": "category",
+    "parent": 4,
+    "meta": [],
+    "_links": {
+      "self": [
+        {
+          "href": "http://testing.local/wp-json/wp/v2/categories/18",
+          "targetHints": {
+            "allow": [
+              "GET"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "http://testing.local/wp-json/wp/v2/categories"
+        }
+      ],
+      "about": [
+        {
+          "href": "http://testing.local/wp-json/wp/v2/taxonomies/category"
+        }
+      ],
+      "up": [
+        {
+          "embeddable": true,
+          "href": "http://testing.local/wp-json/wp/v2/categories/4"
+        }
+      ],
+      "wp:post_type": [
+        {
+          "href": "http://testing.local/wp-json/wp/v2/posts?categories=18"
+        }
+      ],
+      "curies": [
+        {
+          "name": "wp",
+          "href": "https://api.w.org/{rel}",
+          "templated": true
+        }
+      ]
+    }
+  },
+  {
+    "id": 3,
+    "count": 3,
+    "description": "",
+    "link": "http://testing.local/category/parks/",
+    "name": "Parks",
+    "slug": "parks",
+    "taxonomy": "category",
+    "parent": 0,
+    "meta": [],
+    "_links": {
+      "self": [
+        {
+          "href": "http://testing.local/wp-json/wp/v2/categories/3",
+          "targetHints": {
+            "allow": [
+              "GET"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "http://testing.local/wp-json/wp/v2/categories"
+        }
+      ],
+      "about": [
+        {
+          "href": "http://testing.local/wp-json/wp/v2/taxonomies/category"
+        }
+      ],
+      "wp:post_type": [
+        {
+          "href": "http://testing.local/wp-json/wp/v2/posts?categories=3"
+        }
+      ],
+      "curies": [
+        {
+          "name": "wp",
+          "href": "https://api.w.org/{rel}",
+          "templated": true
+        }
+      ]
+    }
+  },
+  {
+    "id": 4,
+    "count": 0,
+    "description": "",
+    "link": "http://testing.local/category/regions/",
+    "name": "Regions",
+    "slug": "regions",
+    "taxonomy": "category",
+    "parent": 0,
+    "meta": [],
+    "_links": {
+      "self": [
+        {
+          "href": "http://testing.local/wp-json/wp/v2/categories/4",
+          "targetHints": {
+            "allow": [
+              "GET"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "http://testing.local/wp-json/wp/v2/categories"
+        }
+      ],
+      "about": [
+        {
+          "href": "http://testing.local/wp-json/wp/v2/taxonomies/category"
+        }
+      ],
+      "wp:post_type": [
+        {
+          "href": "http://testing.local/wp-json/wp/v2/posts?categories=4"
+        }
+      ],
+      "curies": [
+        {
+          "name": "wp",
+          "href": "https://api.w.org/{rel}",
+          "templated": true
+        }
+      ]
+    }
+  },
+  {
+    "id": 5,
+    "count": 1,
+    "description": "",
+    "link": "http://testing.local/category/regions/st-albans/",
+    "name": "St Albans",
+    "slug": "st-albans",
+    "taxonomy": "category",
+    "parent": 4,
+    "meta": [],
+    "_links": {
+      "self": [
+        {
+          "href": "http://testing.local/wp-json/wp/v2/categories/5",
+          "targetHints": {
+            "allow": [
+              "GET"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "http://testing.local/wp-json/wp/v2/categories"
+        }
+      ],
+      "about": [
+        {
+          "href": "http://testing.local/wp-json/wp/v2/taxonomies/category"
+        }
+      ],
+      "up": [
+        {
+          "embeddable": true,
+          "href": "http://testing.local/wp-json/wp/v2/categories/4"
+        }
+      ],
+      "wp:post_type": [
+        {
+          "href": "http://testing.local/wp-json/wp/v2/posts?categories=5"
+        }
+      ],
+      "curies": [
+        {
+          "name": "wp",
+          "href": "https://api.w.org/{rel}",
+          "templated": true
+        }
+      ]
+    }
+  }
+]
