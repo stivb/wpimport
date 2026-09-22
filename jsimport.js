@@ -1,4 +1,4 @@
-const XML_URL = './outdoorsinherts.WordPress.2026-09-03.xml';
+const XML_URL = './site1/outdoorsinherts.WordPress.2026-09-03.xml';
 
 const importState = {
   db: null,

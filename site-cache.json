@@ -1,0 +1,796 @@
+{
+  "generatedAt": "2026-09-22T10:52:09.400Z",
+  "sites": [
+    {
+      "site_id": "site1",
+      "title": "Outdoors In Herts",
+      "base_url": "https://wpdeepdive2.wordpress.com",
+      "xml_file": "export.xml",
+      "site_order": 0
+    },
+    {
+      "site_id": "site2",
+      "title": "Get Fit In Herts",
+      "base_url": "https://getfitinherts.wordpress.com",
+      "xml_file": "getfitinherts.WordPress.2026-09-22.xml",
+      "site_order": 1
+    }
+  ],
+  "terms": [
+    {
+      "site_id": "site1",
+      "term_id": 3374,
+      "kind": "category",
+      "name": "Kids",
+      "slug": "kids",
+      "description": "",
+      "parent": ""
+    },
+    {
+      "site_id": "site1",
+      "term_id": 9128,
+      "kind": "category",
+      "name": "Parks",
+      "slug": "parks",
+      "description": "",
+      "parent": ""
+    },
+    {
+      "site_id": "site1",
+      "term_id": 18302,
+      "kind": "category",
+      "name": "Regions",
+      "slug": "regions",
+      "description": "",
+      "parent": ""
+    },
+    {
+      "site_id": "site1",
+      "term_id": 620930,
+      "kind": "category",
+      "name": "St Albans",
+      "slug": "st-albans",
+      "description": "",
+      "parent": "regions"
+    },
+    {
+      "site_id": "site1",
+      "term_id": 626664,
+      "kind": "category",
+      "name": "Stevenage",
+      "slug": "stevenage",
+      "description": "",
+      "parent": "regions"
+    },
+    {
+      "site_id": "site1",
+      "term_id": 985171,
+      "kind": "category",
+      "name": "Three Rivers",
+      "slug": "three-rivers",
+      "description": "",
+      "parent": "regions"
+    },
+    {
+      "site_id": "site1",
+      "term_id": 97,
+      "kind": "category",
+      "name": "Uncategorized",
+      "slug": "uncategorized",
+      "description": "",
+      "parent": ""
+    },
+    {
+      "site_id": "site1",
+      "term_id": 30309,
+      "kind": "category",
+      "name": "Walking",
+      "slug": "walking",
+      "description": "",
+      "parent": ""
+    },
+    {
+      "site_id": "site1",
+      "term_id": 246901,
+      "kind": "category",
+      "name": "Watford",
+      "slug": "watford",
+      "description": "",
+      "parent": "regions"
+    },
+    {
+      "site_id": "site1",
+      "term_id": 31353015,
+      "kind": "category",
+      "name": "Welwyn Hatfield",
+      "slug": "welwyn-hatfield",
+      "description": "",
+      "parent": "regions"
+    },
+    {
+      "site_id": "site1",
+      "term_id": 23198,
+      "kind": "category",
+      "name": "Wildlife",
+      "slug": "wildlife",
+      "description": "",
+      "parent": ""
+    },
+    {
+      "site_id": "site1",
+      "term_id": 38892,
+      "kind": "category",
+      "name": "Woods",
+      "slug": "woods",
+      "description": "",
+      "parent": "walking"
+    },
+    {
+      "site_id": "site1",
+      "term_id": 1196354,
+      "kind": "category",
+      "name": "Broxbourne",
+      "slug": "broxbourne",
+      "description": "",
+      "parent": "regions"
+    },
+    {
+      "site_id": "site1",
+      "term_id": 9298519,
+      "kind": "category",
+      "name": "Dacorum",
+      "slug": "dacorum",
+      "description": "",
+      "parent": "regions"
+    },
+    {
+      "site_id": "site1",
+      "term_id": 72437690,
+      "kind": "category",
+      "name": "East Hertfordshire",
+      "slug": "east-hertfordshire",
+      "description": "",
+      "parent": "regions"
+    },
+    {
+      "site_id": "site1",
+      "term_id": 32561434,
+      "kind": "category",
+      "name": "Hertsmere",
+      "slug": "hertsmere",
+      "description": "",
+      "parent": "regions"
+    },
+    {
+      "site_id": "site1",
+      "term_id": 189325,
+      "kind": "category",
+      "name": "Hills",
+      "slug": "hills",
+      "description": "",
+      "parent": "walking"
+    },
+    {
+      "site_id": "site1",
+      "term_id": 29517831,
+      "kind": "category",
+      "name": "North Hertfordshire",
+      "slug": "north-hertfordshire",
+      "description": "",
+      "parent": "regions"
+    },
+    {
+      "site_id": "site1",
+      "term_id": 767815349,
+      "kind": "tag",
+      "name": "\u00a3",
+      "slug": "",
+      "description": "",
+      "parent": ""
+    },
+    {
+      "site_id": "site1",
+      "term_id": 767815344,
+      "kind": "tag",
+      "name": "\u00a3\u00a3",
+      "slug": "",
+      "description": "",
+      "parent": ""
+    },
+    {
+      "site_id": "site1",
+      "term_id": 767815335,
+      "kind": "tag",
+      "name": "\u00a3\u00a3\u00a3",
+      "slug": "",
+      "description": "",
+      "parent": ""
+    },
+    {
+      "site_id": "site1",
+      "term_id": 1827,
+      "kind": "tag",
+      "name": "free",
+      "slug": "free",
+      "description": "No charge for entry",
+      "parent": ""
+    },
+    {
+      "site_id": "site2",
+      "term_id": 10343,
+      "kind": "category",
+      "name": "gym",
+      "slug": "gym",
+      "description": "",
+      "parent": ""
+    },
+    {
+      "site_id": "site2",
+      "term_id": 9673,
+      "kind": "category",
+      "name": "outdoors",
+      "slug": "outdoors",
+      "description": "",
+      "parent": ""
+    },
+    {
+      "site_id": "site2",
+      "term_id": 97,
+      "kind": "category",
+      "name": "Uncategorized",
+      "slug": "uncategorized",
+      "description": "",
+      "parent": ""
+    }
+  ],
+  "posts": [
+    {
+      "site_id": "site1",
+      "id": 1,
+      "post_type": "page",
+      "title": "Sports and Activities",
+      "link": "https://wpdeepdive2.wordpress.com/about/",
+      "date": "2023-11-30 12:33:09",
+      "content": "<!-- wp:paragraph -->\n<p>This is an example of a page. Unlike posts, which are displayed on your blog\u2019s front page in the order they\u2019re published, pages are better suited for more timeless content that you want to be easily accessible, like your About or Contact information. Click the Edit link to make changes to this page or <a title=\"Direct link to Add New Page in your Dashboard\" href=\"https://wordpress.com/page/226499940/new/\">add another page</a>.</p>\n<!-- /wp:paragraph -->",
+      "excerpt": "",
+      "status": "publish",
+      "post_name": "about",
+      "row_order": 0
+    },
+    {
+      "site_id": "site1",
+      "id": 10,
+      "post_type": "page",
+      "title": "Social Groups",
+      "link": "https://wpdeepdive2.wordpress.com/social-groups/",
+      "date": "2023-12-06 12:24:17",
+      "content": "",
+      "excerpt": "",
+      "status": "publish",
+      "post_name": "social-groups",
+      "row_order": 1
+    },
+    {
+      "site_id": "site1",
+      "id": 12,
+      "post_type": "page",
+      "title": "Parks",
+      "link": "https://wpdeepdive2.wordpress.com/parks/",
+      "date": "2023-12-06 12:26:59",
+      "content": "<!-- wp:a8c/blog-posts {\"showExcerpt\":false,\"showDate\":false,\"showAuthor\":false,\"postsToShow\":5,\"categories\":[\"9128\"]} /-->",
+      "excerpt": "",
+      "status": "publish",
+      "post_name": "parks",
+      "row_order": 2
+    },
+    {
+      "site_id": "site1",
+      "id": 15,
+      "post_type": "page",
+      "title": "By Region",
+      "link": "https://wpdeepdive2.wordpress.com/by-region/",
+      "date": "2023-12-06 12:28:14",
+      "content": "<!-- wp:page-list {\"parentPageID\":15} /-->",
+      "excerpt": "",
+      "status": "publish",
+      "post_name": "by-region",
+      "row_order": 3
+    },
+    {
+      "site_id": "site1",
+      "id": 46,
+      "post_type": "page",
+      "title": "Walking",
+      "link": "https://wpdeepdive2.wordpress.com/walking/",
+      "date": "2023-12-06 15:55:25",
+      "content": "<!-- wp:html -->\n<div style=\"width:100%;justify-content;start\"><a href=\"#\"><h2 style=\"display:inline\">Hill Walking</h2></a>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <a href=\"#\"><h2 style=\"display:inline\">Wood Walking</h2></a></div>\n<!-- /wp:html -->\n\n<!-- wp:paragraph -->\n<p>There are many great places to walk in Hertfordshire.  Come to this page to see them.</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:a8c/blog-posts {\"className\":\"is-style-borders\",\"showExcerpt\":false,\"showDate\":false,\"showAuthor\":false,\"postsToShow\":5,\"categories\":[\"30309\"],\"sectionHeader\":\"These are my favorites\"} /-->",
+      "excerpt": "",
+      "status": "publish",
+      "post_name": "walking",
+      "row_order": 4
+    },
+    {
+      "site_id": "site1",
+      "id": 88,
+      "post_type": "page",
+      "title": "",
+      "link": "https://wpdeepdive2.wordpress.com/",
+      "date": "2023-12-07 07:15:22",
+      "content": "<!-- wp:jetpack/slideshow {\"autoplay\":true,\"ids\":[86,87,79,78,77,75],\"effect\":\"fade\",\"sizeSlug\":\"large\"} -->\n<div class=\"wp-block-jetpack-slideshow aligncenter\" data-autoplay=\"true\" data-delay=\"3\" data-effect=\"fade\"><div class=\"wp-block-jetpack-slideshow_container swiper-container\"><ul class=\"wp-block-jetpack-slideshow_swiper-wrapper swiper-wrapper\"><li class=\"wp-block-jetpack-slideshow_slide swiper-slide\"><figure><img alt=\"\" class=\"wp-block-jetpack-slideshow_image wp-image-86\" data-id=\"86\" src=\"site1/images/wendover_woods.jpg\" /></figure></li><li class=\"wp-block-jetpack-slideshow_slide swiper-slide\"><figure><img alt=\"\" class=\"wp-block-jetpack-slideshow_image wp-image-87\" data-id=\"87\" src=\"site1/images/1280px-wendover_clock_tower.jpg\" /></figure></li><li class=\"wp-block-jetpack-slideshow_slide swiper-slide\"><figure><img alt=\"\" class=\"wp-block-jetpack-slideshow_image wp-image-79\" data-id=\"79\" src=\"site1/images/hatfield_house.jpg\" /></figure></li><li class=\"wp-block-jetpack-slideshow_slide swiper-slide\"><figure><img alt=\"\" class=\"wp-block-jetpack-slideshow_image wp-image-78\" data-id=\"78\" src=\"site1/images/stanborough_park_01.jpg\" /></figure></li><li class=\"wp-block-jetpack-slideshow_slide swiper-slide\"><figure><img alt=\"\" class=\"wp-block-jetpack-slideshow_image wp-image-77\" data-id=\"77\" src=\"site1/images/cmglee_stanborough_park_southern_lake.jpg\" /></figure></li><li class=\"wp-block-jetpack-slideshow_slide swiper-slide\"><figure><img alt=\"\" class=\"wp-block-jetpack-slideshow_image wp-image-75\" data-id=\"75\" src=\"site1/images/verulamium_park.jpg\" /></figure></li></ul><a class=\"wp-block-jetpack-slideshow_button-prev swiper-button-prev swiper-button-white\" role=\"button\"></a><a class=\"wp-block-jetpack-slideshow_button-next swiper-button-next swiper-button-white\" role=\"button\"></a><a aria-label=\"Pause Slideshow\" class=\"wp-block-jetpack-slideshow_button-pause\" role=\"button\"></a><div class=\"wp-block-jetpack-slideshow_pagination swiper-pagination swiper-pagination-white\"></div></div></div>\n<!-- /wp:jetpack/slideshow -->",
+      "excerpt": "",
+      "status": "publish",
+      "post_name": "home-page",
+      "row_order": 5
+    },
+    {
+      "site_id": "site1",
+      "id": 98,
+      "post_type": "page",
+      "title": "Welwyn and Hatfield",
+      "link": "https://wpdeepdive2.wordpress.com/by-region/welwyn-and-hatfield/",
+      "date": "2023-12-07 07:57:45",
+      "content": "<!-- wp:a8c/blog-posts {\"postsToShow\":10,\"categories\":[\"31353015\"]} /-->",
+      "excerpt": "",
+      "status": "publish",
+      "post_name": "welwyn-and-hatfield",
+      "row_order": 6
+    },
+    {
+      "site_id": "site1",
+      "id": 107,
+      "post_type": "page",
+      "title": "St Albans",
+      "link": "https://wpdeepdive2.wordpress.com/st-albans/",
+      "date": "2023-12-07 08:33:21",
+      "content": "<!-- wp:a8c/blog-posts {\"categories\":[\"620930\"]} /-->",
+      "excerpt": "",
+      "status": "publish",
+      "post_name": "st-albans",
+      "row_order": 7
+    },
+    {
+      "site_id": "site1",
+      "id": 104,
+      "post_type": "page",
+      "title": "Tring",
+      "link": "https://wpdeepdive2.wordpress.com/by-region/tring/",
+      "date": "2023-12-07 08:28:00",
+      "content": "<!-- wp:a8c/blog-posts {\"showCategory\":true,\"categories\":[\"9298519\"]} /-->",
+      "excerpt": "",
+      "status": "publish",
+      "post_name": "tring",
+      "row_order": 8
+    },
+    {
+      "site_id": "site1",
+      "id": 17,
+      "post_type": "post",
+      "title": "Stanborough Lakes",
+      "link": "https://wpdeepdive2.wordpress.com/2023/12/06/stanborough-lakes/",
+      "date": "2023-12-06 12:28:53",
+      "content": "",
+      "excerpt": "",
+      "status": "publish",
+      "post_name": "stanborough-lakes",
+      "row_order": 9
+    },
+    {
+      "site_id": "site1",
+      "id": 19,
+      "post_type": "post",
+      "title": "Verulanium Park",
+      "link": "https://wpdeepdive2.wordpress.com/2023/12/06/verulanium-park/",
+      "date": "2023-12-06 12:32:35",
+      "content": "<!-- wp:paragraph -->\n<p>Here is one of the many highlights of Verulanium Park</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:image {\"id\":66,\"sizeSlug\":\"large\",\"linkDestination\":\"none\"} -->\n<figure class=\"wp-block-image size-large\"><img src=\"site1/images/dscn1888.jpg\" alt=\"\" class=\"wp-image-66\" /></figure>\n<!-- /wp:image -->",
+      "excerpt": "",
+      "status": "publish",
+      "post_name": "verulanium-park",
+      "row_order": 10
+    },
+    {
+      "site_id": "site1",
+      "id": 20,
+      "post_type": "post",
+      "title": "Hatfield House",
+      "link": "https://wpdeepdive2.wordpress.com/2023/12/06/hatfield-house/",
+      "date": "2023-12-06 12:31:30",
+      "content": "<!-- wp:paragraph -->\n<p>A lovely stately home in Hatfield</p>\n<!-- /wp:paragraph -->",
+      "excerpt": "",
+      "status": "publish",
+      "post_name": "hatfield-house",
+      "row_order": 11
+    },
+    {
+      "site_id": "site1",
+      "id": 21,
+      "post_type": "post",
+      "title": "Paradise Wildlife Park",
+      "link": "https://wpdeepdive2.wordpress.com/2023/12/06/paradise-wildlife-park/",
+      "date": "2023-12-06 12:31:12",
+      "content": "<!-- wp:latest-posts {\"categories\":[{\"id\":9128,\"count\":0,\"description\":\"\",\"link\":\"https://wpdeepdive2.wordpress.com/category/parks/\",\"name\":\"Parks\",\"slug\":\"parks\",\"taxonomy\":\"category\",\"parent\":0,\"meta\":[],\"_links\":{\"self\":[{\"href\":\"https://public-api.wordpress.com/wp/v2/sites/226499940/categories/9128\"}],\"collection\":[{\"href\":\"https://public-api.wordpress.com/wp/v2/sites/226499940/categories\"}],\"about\":[{\"href\":\"https://public-api.wordpress.com/wp/v2/sites/226499940/taxonomies/category\"}],\"wp:post_type\":[{\"href\":\"https://public-api.wordpress.com/wp/v2/sites/226499940/posts?categories=9128\"}],\"curies\":[{\"name\":\"wp\",\"href\":\"https://api.w.org/{rel}\",\"templated\":true}]}}]} /-->",
+      "excerpt": "",
+      "status": "publish",
+      "post_name": "paradise-wildlife-park",
+      "row_order": 12
+    },
+    {
+      "site_id": "site1",
+      "id": 37,
+      "post_type": "post",
+      "title": "The Chilterns",
+      "link": "https://wpdeepdive2.wordpress.com/2023/12/06/the-chilterns/",
+      "date": "2023-12-06 15:49:32",
+      "content": "",
+      "excerpt": "",
+      "status": "publish",
+      "post_name": "the-chilterns",
+      "row_order": 13
+    },
+    {
+      "site_id": "site1",
+      "id": 38,
+      "post_type": "post",
+      "title": "Tring",
+      "link": "https://wpdeepdive2.wordpress.com/2023/12/06/tring/",
+      "date": "2023-12-06 15:49:47",
+      "content": "",
+      "excerpt": "",
+      "status": "publish",
+      "post_name": "tring",
+      "row_order": 14
+    },
+    {
+      "site_id": "site1",
+      "id": 41,
+      "post_type": "post",
+      "title": "Wendover Wood",
+      "link": "https://wpdeepdive2.wordpress.com/2023/12/06/wendover-wood/",
+      "date": "2023-12-06 15:51:48",
+      "content": "<!-- wp:paragraph -->\n<p>This is Wendover Wood</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:image {\"id\":62,\"sizeSlug\":\"large\",\"linkDestination\":\"none\"} -->\n<figure class=\"wp-block-image size-large\"><img src=\"site1/images/dscn1902.jpg\" alt=\"\" class=\"wp-image-62\" /></figure>\n<!-- /wp:image -->",
+      "excerpt": "",
+      "status": "publish",
+      "post_name": "wendover-wood",
+      "row_order": 15
+    },
+    {
+      "site_id": "site1",
+      "id": 54,
+      "post_type": "post",
+      "title": "Hatfield",
+      "link": "https://wpdeepdive2.wordpress.com/2023/12/06/hatfield/",
+      "date": "2023-12-06 16:02:41",
+      "content": "<!-- wp:paragraph -->\n<p>In Hatfield there is Hatfield House that has excellent opportunities for walking.</p>\n<!-- /wp:paragraph -->",
+      "excerpt": "",
+      "status": "publish",
+      "post_name": "hatfield",
+      "row_order": 16
+    },
+    {
+      "site_id": "site1",
+      "id": 56,
+      "post_type": "post",
+      "title": "Whipsnade Zoo",
+      "link": "https://wpdeepdive2.wordpress.com/2023/12/06/whipsnade-zoo/",
+      "date": "2023-12-06 16:03:35",
+      "content": "",
+      "excerpt": "",
+      "status": "publish",
+      "post_name": "whipsnade-zoo",
+      "row_order": 17
+    },
+    {
+      "site_id": "site1",
+      "id": 119,
+      "post_type": "page",
+      "title": "Free",
+      "link": "https://wpdeepdive2.wordpress.com/free/",
+      "date": "2023-12-11 16:23:17",
+      "content": "<!-- wp:a8c/blog-posts {\"tags\":[\"1827\"]} /-->",
+      "excerpt": "",
+      "status": "publish",
+      "post_name": "free",
+      "row_order": 18
+    },
+    {
+      "site_id": "site2",
+      "id": 1,
+      "post_type": "page",
+      "title": "About",
+      "link": "https://getfitinherts.wordpress.com/about/",
+      "date": "2024-11-21 13:09:08",
+      "content": "<!-- wp:paragraph -->\n<p>This is an example of a page. Unlike posts, which are displayed on your blog\u2019s front page in the order they\u2019re published, pages are better suited for more timeless content that you want to be easily accessible, like your About or Contact information. Click the Edit link to make changes to this page or <a title=\"Direct link to Add New Page in your Dashboard\" href=\"https://wordpress.com/page/239234244/new/\">add another page</a>.</p>\n<!-- /wp:paragraph -->",
+      "excerpt": "",
+      "status": "publish",
+      "post_name": "about",
+      "row_order": 0
+    },
+    {
+      "site_id": "site2",
+      "id": 4,
+      "post_type": "post",
+      "title": "The Art of Connection",
+      "link": "https://getfitinherts.wordpress.com/2024/11/21/the-art-of-connection/",
+      "date": "2024-11-21 13:05:07",
+      "content": "<!-- wp:paragraph -->\n<p>Welcome to WordPress! This is a sample post. Edit or delete it to take the first step in your blogging journey. To add more content here, click the small plus icon at the top left corner. There, you will find an existing selection of WordPress blocks and patterns, something to suit your every need for content creation. And don\u2019t forget to check out the List View: click the icon a few spots to the right of the plus icon and you\u2019ll get a tidy, easy-to-view list of the blocks and patterns in your post.</p>\n<!-- /wp:paragraph -->",
+      "excerpt": "In the ever-evolving world, the art of forging genuine connections remains timeless. Whether it\u2019s with colleagues, clients, or partners, establishing a genuine rapport paves the way for collaborative success.",
+      "status": "publish",
+      "post_name": "the-art-of-connection",
+      "row_order": 1
+    },
+    {
+      "site_id": "site2",
+      "id": 5,
+      "post_type": "post",
+      "title": "Beyond the Obstacle",
+      "link": "https://getfitinherts.wordpress.com/2024/11/21/beyond-the-obstacle/",
+      "date": "2024-11-21 13:05:06",
+      "content": "<!-- wp:paragraph -->\n<p>Welcome to WordPress! This is a sample post. Edit or delete it to take the first step in your blogging journey. To add more content here, click the small plus icon at the top left corner. There, you will find an existing selection of WordPress blocks and patterns, something to suit your every need for content creation. And don\u2019t forget to check out the List View: click the icon a few spots to the right of the plus icon and you\u2019ll get a tidy, easy-to-view list of the blocks and patterns in your post.</p>\n<!-- /wp:paragraph -->",
+      "excerpt": "Challenges in business are a given, but it\u2019s our response to them that defines our trajectory. Looking beyond the immediate obstacle, there lies a realm of opportunity and learning.",
+      "status": "publish",
+      "post_name": "beyond-the-obstacle",
+      "row_order": 2
+    },
+    {
+      "site_id": "site2",
+      "id": 6,
+      "post_type": "post",
+      "title": "Growth Unlocked",
+      "link": "https://getfitinherts.wordpress.com/2024/11/21/growth-unlocked/",
+      "date": "2024-11-21 13:05:05",
+      "content": "<!-- wp:paragraph -->\n<p>Welcome to WordPress! This is a sample post. Edit or delete it to take the first step in your blogging journey. To add more content here, click the small plus icon at the top left corner. There, you will find an existing selection of WordPress blocks and patterns, something to suit your every need for content creation. And don\u2019t forget to check out the List View: click the icon a few spots to the right of the plus icon and you\u2019ll get a tidy, easy-to-view list of the blocks and patterns in your post.</p>\n<!-- /wp:paragraph -->",
+      "excerpt": "Every business has a unique potential waiting to be tapped. Recognizing the keys to unlock this growth can set an enterprise on the path to unprecedented success.",
+      "status": "publish",
+      "post_name": "growth-unlocked",
+      "row_order": 3
+    },
+    {
+      "site_id": "site2",
+      "id": 7,
+      "post_type": "post",
+      "title": "Collaboration Magic",
+      "link": "https://getfitinherts.wordpress.com/2024/11/21/collaboration-magic/",
+      "date": "2024-11-21 13:05:04",
+      "content": "<!-- wp:paragraph -->\n<p>Welcome to WordPress! This is a sample post. Edit or delete it to take the first step in your blogging journey. To add more content here, click the small plus icon at the top left corner. There, you will find an existing selection of WordPress blocks and patterns, something to suit your every need for content creation. And don\u2019t forget to check out the List View: click the icon a few spots to the right of the plus icon and you\u2019ll get a tidy, easy-to-view list of the blocks and patterns in your post.</p>\n<!-- /wp:paragraph -->",
+      "excerpt": "The magic that emerges from effective collaboration is undeniable. When diverse minds converge with a shared purpose, the results can be transformative.",
+      "status": "publish",
+      "post_name": "collaboration-magic",
+      "row_order": 4
+    },
+    {
+      "site_id": "site2",
+      "id": 13,
+      "post_type": "post",
+      "title": "My First Post",
+      "link": "https://getfitinherts.wordpress.com/2024/11/21/my-first-post/",
+      "date": "2024-11-21 13:31:50",
+      "content": "<!-- wp:paragraph {\"style\":{\"elements\":{\"link\":{\"color\":{\"text\":\"var:preset|color|quaternary\"}}}},\"textColor\":\"quaternary\",\"fontSize\":\"x-large\"} -->\n<p class=\"has-quaternary-color has-text-color has-link-color has-x-large-font-size\">This is the start</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:image {\"id\":15,\"sizeSlug\":\"full\",\"linkDestination\":\"none\"} -->\n<figure class=\"wp-block-image size-full\"><img src=\"site2/images/draw-me-a-gym-with-exercise-bikes-rowing-machines-weights.png\" alt=\"\" class=\"wp-image-15\" /></figure>\n<!-- /wp:image -->\n\n<!-- wp:paragraph -->\n<p>This is the gym at the University of Hertfordshire, it has lots of equipment</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:list -->\n<ul class=\"wp-block-list\"><!-- wp:list-item -->\n<li>Weights</li>\n<!-- /wp:list-item -->\n\n<!-- wp:list-item -->\n<li>Benchpress</li>\n<!-- /wp:list-item -->\n\n<!-- wp:list-item -->\n<li>Rowing Machine</li>\n<!-- /wp:list-item -->\n\n<!-- wp:list-item -->\n<li>Exercise Bike</li>\n<!-- /wp:list-item --></ul>\n<!-- /wp:list -->\n\n<!-- wp:heading {\"level\":3} -->\n<h3 class=\"wp-block-heading\">Weights and Benchpress in a Gym</h3>\n<!-- /wp:heading -->\n\n<!-- wp:paragraph -->\n<p>In many gyms, weights and benchpress equipment are essential for strength training and building muscle. Here\u2019s a closer look at these two components:</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:heading {\"level\":4} -->\n<h4 class=\"wp-block-heading\">Weights</h4>\n<!-- /wp:heading -->\n\n<!-- wp:paragraph -->\n<p>Weights come in various forms, including:</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:list -->\n<ul class=\"wp-block-list\"><!-- wp:list-item -->\n<li><strong>Dumbbells</strong>: These are versatile and can be used for a wide range of exercises, allowing for isolated muscle training.</li>\n<!-- /wp:list-item -->\n\n<!-- wp:list-item -->\n<li><strong>Barbells</strong>: Longer bars used with weight plates, essential for exercises like squats and deadlifts.</li>\n<!-- /wp:list-item -->\n\n<!-- wp:list-item -->\n<li><strong>Weight Plates</strong>: These come in different sizes and can be added to barbells for customized weight training.</li>\n<!-- /wp:list-item --></ul>\n<!-- /wp:list -->\n\n<!-- wp:heading {\"level\":4} -->\n<h4 class=\"wp-block-heading\">Benchpress</h4>\n<!-- /wp:heading -->\n\n<!-- wp:paragraph -->\n<p>The benchpress is a core exercise for targeting the chest, shoulders, and triceps. Key features include:</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:list -->\n<ul class=\"wp-block-list\"><!-- wp:list-item -->\n<li><strong>Flat Bench</strong>: The standard setup for performing the classic bench press.</li>\n<!-- /wp:list-item -->\n\n<!-- wp:list-item -->\n<li><strong>Incline Bench</strong>: Slightly angled to target upper chest muscles.</li>\n<!-- /wp:list-item -->\n\n<!-- wp:list-item -->\n<li><strong>Decline Bench</strong>: Angled downward to focus on lower chest development.</li>\n<!-- /wp:list-item --></ul>\n<!-- /wp:list -->\n\n<!-- wp:paragraph -->\n<p>Incorporating both weights and benchpress workouts into your routine can significantly enhance your strength and fitness levels.</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:paragraph -->\n<p></p>\n<!-- /wp:paragraph -->",
+      "excerpt": "",
+      "status": "publish",
+      "post_name": "my-first-post",
+      "row_order": 5
+    },
+    {
+      "site_id": "site2",
+      "id": 23,
+      "post_type": "post",
+      "title": "Second post",
+      "link": "https://getfitinherts.wordpress.com/2024/11/21/second-post/",
+      "date": "2024-11-21 13:33:29",
+      "content": "<!-- wp:image {\"id\":22,\"sizeSlug\":\"large\"} -->\n<figure class=\"wp-block-image size-large\"><img src=\"site2/images/wp-17321959999789154176659838121188.jpg\" alt=\"\" class=\"wp-image-22\" /></figure>\n<!-- /wp:image -->",
+      "excerpt": "",
+      "status": "publish",
+      "post_name": "second-post",
+      "row_order": 6
+    },
+    {
+      "site_id": "site2",
+      "id": 25,
+      "post_type": "post",
+      "title": "Outdoors",
+      "link": "https://getfitinherts.wordpress.com/2024/11/21/outdoors/",
+      "date": "2024-11-21 13:38:17",
+      "content": "<!-- wp:paragraph -->\n<p>Park runs</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:image {\"id\":26,\"sizeSlug\":\"full\",\"linkDestination\":\"none\"} -->\n<figure class=\"wp-block-image size-full\"><img src=\"site2/images/make-a-picture-of-a-large-group-of-people-running.png\" alt=\"\" class=\"wp-image-26\" /></figure>\n<!-- /wp:image -->",
+      "excerpt": "",
+      "status": "publish",
+      "post_name": "outdoors",
+      "row_order": 7
+    },
+    {
+      "site_id": "site2",
+      "id": 29,
+      "post_type": "page",
+      "title": "Gyms",
+      "link": "https://getfitinherts.wordpress.com/gyms/",
+      "date": "2024-11-21 13:40:24",
+      "content": "<!-- wp:latest-posts {\"categories\":[{\"id\":10343,\"count\":2,\"description\":\"\",\"link\":\"https://getfitinherts.wordpress.com/category/gym/\",\"name\":\"gym\",\"slug\":\"gym\",\"taxonomy\":\"category\",\"parent\":0,\"meta\":[],\"_links\":{\"self\":[{\"href\":\"https://public-api.wordpress.com/wp/v2/sites/239234244/categories/10343\",\"targetHints\":{\"allow\":[\"GET\",\"POST\",\"PUT\",\"PATCH\",\"DELETE\"]}}],\"collection\":[{\"href\":\"https://public-api.wordpress.com/wp/v2/sites/239234244/categories\"}],\"about\":[{\"href\":\"https://public-api.wordpress.com/wp/v2/sites/239234244/taxonomies/category\"}],\"wp:post_type\":[{\"href\":\"https://public-api.wordpress.com/wp/v2/sites/239234244/posts?categories=10343\"}],\"curies\":[{\"name\":\"wp\",\"href\":\"https://api.w.org/{rel}\",\"templated\":true}]}}]} /-->",
+      "excerpt": "",
+      "status": "publish",
+      "post_name": "gyms",
+      "row_order": 8
+    },
+    {
+      "site_id": "site2",
+      "id": 33,
+      "post_type": "page",
+      "title": "Outdoors",
+      "link": "https://getfitinherts.wordpress.com/outdoors/",
+      "date": "2024-11-21 13:41:22",
+      "content": "<!-- wp:latest-posts {\"categories\":[{\"id\":9673,\"count\":1,\"description\":\"\",\"link\":\"https://getfitinherts.wordpress.com/category/outdoors/\",\"name\":\"outdoors\",\"slug\":\"outdoors\",\"taxonomy\":\"category\",\"parent\":0,\"meta\":[],\"_links\":{\"self\":[{\"href\":\"https://public-api.wordpress.com/wp/v2/sites/239234244/categories/9673\",\"targetHints\":{\"allow\":[\"GET\",\"POST\",\"PUT\",\"PATCH\",\"DELETE\"]}}],\"collection\":[{\"href\":\"https://public-api.wordpress.com/wp/v2/sites/239234244/categories\"}],\"about\":[{\"href\":\"https://public-api.wordpress.com/wp/v2/sites/239234244/taxonomies/category\"}],\"wp:post_type\":[{\"href\":\"https://public-api.wordpress.com/wp/v2/sites/239234244/posts?categories=9673\"}],\"curies\":[{\"name\":\"wp\",\"href\":\"https://api.w.org/{rel}\",\"templated\":true}]}}]} /-->",
+      "excerpt": "",
+      "status": "publish",
+      "post_name": "outdoors",
+      "row_order": 9
+    },
+    {
+      "site_id": "site2",
+      "id": 39,
+      "post_type": "post",
+      "title": "Here in classroom",
+      "link": "https://getfitinherts.wordpress.com/2024/11/28/here-in-classroom/",
+      "date": "2024-11-28 14:40:49",
+      "content": "<!-- wp:image {\"id\":38,\"sizeSlug\":\"large\"} -->\n<figure class=\"wp-block-image size-large\"><img src=\"site2/images/wp-17328048332625908386918613834966.jpg\" alt=\"\" class=\"wp-image-38\" /></figure>\n<!-- /wp:image -->",
+      "excerpt": "",
+      "status": "publish",
+      "post_name": "here-in-classroom",
+      "row_order": 10
+    }
+  ],
+  "post_terms": [
+    {
+      "site_id": "site1",
+      "post_id": 17,
+      "term_id": 1827,
+      "kind": "tag"
+    },
+    {
+      "site_id": "site1",
+      "post_id": 17,
+      "term_id": 9128,
+      "kind": "category"
+    },
+    {
+      "site_id": "site1",
+      "post_id": 17,
+      "term_id": 31353015,
+      "kind": "category"
+    },
+    {
+      "site_id": "site1",
+      "post_id": 19,
+      "term_id": 1827,
+      "kind": "tag"
+    },
+    {
+      "site_id": "site1",
+      "post_id": 19,
+      "term_id": 9128,
+      "kind": "category"
+    },
+    {
+      "site_id": "site1",
+      "post_id": 19,
+      "term_id": 620930,
+      "kind": "category"
+    },
+    {
+      "site_id": "site1",
+      "post_id": 20,
+      "term_id": 9128,
+      "kind": "category"
+    },
+    {
+      "site_id": "site1",
+      "post_id": 20,
+      "term_id": 31353015,
+      "kind": "category"
+    },
+    {
+      "site_id": "site1",
+      "post_id": 21,
+      "term_id": 97,
+      "kind": "category"
+    },
+    {
+      "site_id": "site1",
+      "post_id": 37,
+      "term_id": 1827,
+      "kind": "tag"
+    },
+    {
+      "site_id": "site1",
+      "post_id": 37,
+      "term_id": 97,
+      "kind": "category"
+    },
+    {
+      "site_id": "site1",
+      "post_id": 37,
+      "term_id": 30309,
+      "kind": "category"
+    },
+    {
+      "site_id": "site1",
+      "post_id": 38,
+      "term_id": 9298519,
+      "kind": "category"
+    },
+    {
+      "site_id": "site1",
+      "post_id": 41,
+      "term_id": 9298519,
+      "kind": "category"
+    },
+    {
+      "site_id": "site1",
+      "post_id": 41,
+      "term_id": 30309,
+      "kind": "category"
+    },
+    {
+      "site_id": "site1",
+      "post_id": 41,
+      "term_id": 38892,
+      "kind": "category"
+    },
+    {
+      "site_id": "site1",
+      "post_id": 54,
+      "term_id": 97,
+      "kind": "category"
+    },
+    {
+      "site_id": "site1",
+      "post_id": 56,
+      "term_id": 97,
+      "kind": "category"
+    },
+    {
+      "site_id": "site2",
+      "post_id": 4,
+      "term_id": 97,
+      "kind": "category"
+    },
+    {
+      "site_id": "site2",
+      "post_id": 5,
+      "term_id": 97,
+      "kind": "category"
+    },
+    {
+      "site_id": "site2",
+      "post_id": 6,
+      "term_id": 97,
+      "kind": "category"
+    },
+    {
+      "site_id": "site2",
+      "post_id": 7,
+      "term_id": 97,
+      "kind": "category"
+    },
+    {
+      "site_id": "site2",
+      "post_id": 13,
+      "term_id": 10343,
+      "kind": "category"
+    },
+    {
+      "site_id": "site2",
+      "post_id": 23,
+      "term_id": 10343,
+      "kind": "category"
+    },
+    {
+      "site_id": "site2",
+      "post_id": 25,
+      "term_id": 9673,
+      "kind": "category"
+    },
+    {
+      "site_id": "site2",
+      "post_id": 39,
+      "term_id": 97,
+      "kind": "category"
+    }
+  ]
+}

@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mashup: All Sites</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.13.0/sql-wasm.js"></script>
+    <style>
+      :root {
+        --bg: #f4f7f1;
+        --panel: #ffffff;
+        --text: #1f2937;
+        --muted: #6b7280;
+        --border: #dfe7d7;
+        --green: #2f7d4a;
+        --green-soft: #eaf5ee;
+        --blue: #1d4ed8;
+        --blue-soft: #e0ebff;
+        --amber: #b45309;
+        --amber-soft: #fef3c7;
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        font-family: Arial, Helvetica, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.6;
+      }
+
+      main {
+        max-width: 1100px;
+        margin: 32px auto;
+        padding: 0 20px 40px;
+      }
+
+      h1 {
+        margin: 0 0 12px;
+        font-size: 2.1rem;
+      }
+
+      .subtitle {
+        color: var(--muted);
+        margin-bottom: 10px;
+      }
+
+      .status-line {
+        color: var(--muted);
+        font-size: 0.9rem;
+        margin-bottom: 22px;
+      }
+
+      .cache-actions {
+        margin-bottom: 22px;
+      }
+
+      .cache-actions button {
+        background: var(--green);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 8px 14px;
+        font-size: 0.9rem;
+        cursor: pointer;
+      }
+
+      .filter-panel {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 16px 18px;
+        margin-bottom: 24px;
+      }
+
+      .filter-panel h2 {
+        margin: 0 0 12px;
+        font-size: 1.1rem;
+      }
+
+      .filter-group {
+        margin-bottom: 14px;
+      }
+
+      .filter-group:last-child {
+        margin-bottom: 0;
+      }
+
+      .filter-label {
+        display: block;
+        font-weight: 700;
+        margin-bottom: 8px;
+      }
+
+      .filter-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .filter-link {
+        display: inline-block;
+        border: 1px solid var(--border);
+        background: var(--green-soft);
+        color: var(--green);
+        border-radius: 999px;
+        padding: 6px 10px;
+        text-decoration: none;
+        font-size: 0.9rem;
+        cursor: pointer;
+      }
+
+      .filter-link.active {
+        background: var(--green);
+        color: white;
+        border-color: var(--green);
+      }
+
+      .filter-link.tag {
+        background: var(--blue-soft);
+        color: var(--blue);
+        border-color: #bfd4ff;
+      }
+
+      .filter-link.tag.active {
+        background: var(--blue);
+        color: white;
+        border-color: var(--blue);
+      }
+
+      .filter-link.site {
+        background: var(--amber-soft);
+        color: var(--amber);
+        border-color: #fcd9a3;
+      }
+
+      .filter-link.site.active {
+        background: var(--amber);
+        color: white;
+        border-color: var(--amber);
+      }
+
+      .post {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 22px 24px;
+        margin-bottom: 20px;
+      }
+
+      .post h2 {
+        margin-top: 0;
+        margin-bottom: 6px;
+        font-size: 1.85rem;
+      }
+
+      .post-meta {
+        color: var(--muted);
+        font-size: 0.9rem;
+        margin-bottom: 16px;
+      }
+
+      .site-badge {
+        display: inline-block;
+        background: var(--amber-soft);
+        color: var(--amber);
+        border-radius: 999px;
+        padding: 2px 9px;
+        font-size: 0.78rem;
+        font-weight: 700;
+        margin-right: 8px;
+      }
+
+      .type-badge {
+        display: inline-block;
+        background: #eef2ff;
+        color: #4338ca;
+        border-radius: 999px;
+        padding: 2px 9px;
+        font-size: 0.78rem;
+        font-weight: 700;
+        margin-right: 8px;
+      }
+
+      .post-content p {
+        margin: 0 0 1em;
+      }
+
+      .post-content img {
+        display: block;
+        max-width: 100%;
+        height: auto;
+        border-radius: 10px;
+        border: 1px solid var(--border);
+        margin: 10px 0;
+      }
+
+      .post-content figure {
+        margin: 20px 0;
+      }
+
+      .empty {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 20px 24px;
+        color: var(--muted);
+      }
+
+      .error {
+        background: #fff2f2;
+        border: 1px solid #fecaca;
+        color: #991b1b;
+        border-radius: 10px;
+        padding: 16px 18px;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Mashup: All Sites</h1>
+      <div class="subtitle">Combined posts and pages from every siteN folder, filterable by site, category, or tag.</div>
+      <div class="status-line" id="status-line">Loading...</div>
+
+      <div class="cache-actions">
+        <button id="download-cache">Download cache (site-cache.json)</button>
+      </div>
+
+      <section class="filter-panel">
+        <h2>Filter content</h2>
+        <div id="filter-controls"></div>
+      </section>
+
+      <div id="posts"></div>
+    </main>
+
+    <script src="./mashup-import.js"></script>
+    <script>
+      const uiState = {
+        site: 'ALL',
+        category: 'ALL',
+        tag: 'ALL',
+      };
+
+      function escapeHtml(value) {
+        return String(value || '')
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;');
+      }
+
+      function formatDate(dateString) {
+        if (!dateString) return '';
+        const date = new Date(dateString.replace(' ', 'T'));
+        if (Number.isNaN(date.getTime())) return dateString;
+        return date.toLocaleDateString(undefined, {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+        });
+      }
+
+      function renderFilters() {
+        const container = document.getElementById('filter-controls');
+        const sites = window.mashupImport.getAllSites();
+        const termSummaries = window.mashupImport.getTermSummaries();
+        const categories = termSummaries.filter((term) => term.kind === 'category');
+        const tags = termSummaries.filter((term) => term.kind === 'tag');
+
+        const buildButtons = (groupKey, cssClass, allLabel, items, labelOf, countOf) => {
+          const buttons = [
+            `<a class="filter-link ${cssClass} ${uiState[groupKey] === 'ALL' ? 'active' : ''}" href="#" data-group="${groupKey}" data-value="ALL">${allLabel}</a>`,
+          ];
+          items.forEach((item) => {
+            const value = labelOf(item);
+            const isActive = uiState[groupKey] === value;
+            buttons.push(
+              `<a class="filter-link ${cssClass} ${isActive ? 'active' : ''}" href="#" data-group="${groupKey}" data-value="${escapeHtml(value)}">${escapeHtml(value)} (${countOf(item)})</a>`
+            );
+          });
+          return buttons.join('');
+        };
+
+        const siteCounts = sites.map((site) => {
+          const db = window.mashupImport.getDb();
+          const result = db.exec('SELECT COUNT(*) FROM posts WHERE site_id = ?', [site.site_id]);
+          const count = result && result[0] ? result[0].values[0][0] : 0;
+          return { ...site, count };
+        });
+
+        container.innerHTML = `
+          <div class="filter-group">
+            <span class="filter-label">Sites</span>
+            <div class="filter-list">${buildButtons('site', 'site', 'All sites', siteCounts, (s) => s.site_id, (s) => `${s.title} · ${s.count}`)}</div>
+          </div>
+          <div class="filter-group">
+            <span class="filter-label">Categories</span>
+            <div class="filter-list">${buildButtons('category', '', 'All categories', categories, (t) => t.name, (t) => t.count)}</div>
+          </div>
+          <div class="filter-group">
+            <span class="filter-label">Tags</span>
+            <div class="filter-list">${buildButtons('tag', 'tag', 'All tags', tags, (t) => t.name, (t) => t.count)}</div>
+          </div>
+        `;
+
+        container.querySelectorAll('.filter-link').forEach((link) => {
+          link.addEventListener('click', (event) => {
+            event.preventDefault();
+            const group = link.getAttribute('data-group');
+            const value = link.getAttribute('data-value');
+            uiState[group] = value;
+            renderFilters();
+            renderPosts();
+          });
+        });
+      }
+
+      function renderPosts() {
+        const container = document.getElementById('posts');
+        const db = window.mashupImport.getDb();
+        if (!db) return;
+
+        let sql = `
+          SELECT p.site_id, p.id, p.post_type, p.title, p.link, p.date, p.content, p.excerpt, s.title AS site_title
+          FROM posts p
+          JOIN sites s ON s.site_id = p.site_id
+        `;
+        const conditions = [];
+        const params = [];
+
+        if (uiState.site !== 'ALL') {
+          conditions.push('p.site_id = ?');
+          params.push(uiState.site);
+        }
+        if (uiState.category !== 'ALL') {
+          conditions.push(`EXISTS (
+            SELECT 1 FROM post_terms pt
+            JOIN terms t ON t.term_id = pt.term_id AND t.site_id = pt.site_id AND t.kind = pt.kind
+            WHERE pt.post_id = p.id AND pt.site_id = p.site_id AND pt.kind = 'category' AND t.name = ?
+          )`);
+          params.push(uiState.category);
+        }
+        if (uiState.tag !== 'ALL') {
+          conditions.push(`EXISTS (
+            SELECT 1 FROM post_terms pt
+            JOIN terms t ON t.term_id = pt.term_id AND t.site_id = pt.site_id AND t.kind = pt.kind
+            WHERE pt.post_id = p.id AND pt.site_id = p.site_id AND pt.kind = 'tag' AND t.name = ?
+          )`);
+          params.push(uiState.tag);
+        }
+
+        if (conditions.length) {
+          sql += ` WHERE ${conditions.join(' AND ')}`;
+        }
+        sql += ' ORDER BY p.date ASC, p.row_order ASC';
+
+        const result = db.exec(sql, params);
+        const rows = result && result[0] ? result[0].values : [];
+
+        if (!rows.length) {
+          container.innerHTML = '<div class="empty">No posts or pages match this filter.</div>';
+          return;
+        }
+
+        const columns = result[0].columns;
+        const posts = rows.map((row) => {
+          const obj = {};
+          columns.forEach((col, idx) => {
+            obj[col] = row[idx];
+          });
+          return obj;
+        });
+
+        container.innerHTML = posts.map((post) => {
+          const title = post.title || 'Untitled';
+          const content = post.content && post.content.trim() ? post.content : (post.excerpt || '<p>No content available.</p>');
+          return `
+            <article class="post">
+              <h2>${escapeHtml(title)}</h2>
+              <div class="post-meta">
+                <span class="site-badge">${escapeHtml(post.site_title)}</span>
+                <span class="type-badge">${escapeHtml(post.post_type)}</span>
+                Published: ${escapeHtml(formatDate(post.date))}
+              </div>
+              <div class="post-content">${content}</div>
+            </article>
+          `;
+        }).join('');
+      }
+
+      function setStatus(summary) {
+        const statusEl = document.getElementById('status-line');
+        const okSites = summary.sites.filter((site) => site.ok);
+        const failedSites = summary.sites.filter((site) => !site.ok);
+        const source = summary.loadedFromCache ? 'loaded from site-cache.json' : 'freshly imported from XML exports';
+        let text = `${okSites.length} site(s) ${source}.`;
+        if (failedSites.length) {
+          text += ` Skipped: ${failedSites.map((site) => site.folder).join(', ')}.`;
+        }
+        statusEl.textContent = text;
+      }
+
+      async function startApp() {
+        const postsContainer = document.getElementById('posts');
+        const statusEl = document.getElementById('status-line');
+
+        try {
+          const summary = await window.mashupImport.initializeDatabase();
+          setStatus(summary);
+          uiState.site = 'ALL';
+          uiState.category = 'ALL';
+          uiState.tag = 'ALL';
+          renderFilters();
+          renderPosts();
+        } catch (error) {
+          console.error(error);
+          statusEl.textContent = 'Failed to load site content.';
+          postsContainer.innerHTML = `
+            <div class="error">
+              Could not import the site exports. Check the console for details, and confirm each siteN folder has an .xml export file.
+            </div>
+          `;
+        }
+      }
+
+      document.getElementById('download-cache').addEventListener('click', () => {
+        window.mashupImport.downloadCache();
+      });
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', startApp, { once: true });
+      } else {
+        startApp();
+      }
+    </script>
+  </body>
+</html>
