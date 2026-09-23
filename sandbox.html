@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SQL Sandbox: site-cache.json</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.13.0/sql-wasm.js"></script>
+    <style>
+      :root {
+        --bg: #f4f7f1;
+        --panel: #ffffff;
+        --text: #1f2937;
+        --muted: #6b7280;
+        --border: #dfe7d7;
+        --green: #2f7d4a;
+        --green-soft: #eaf5ee;
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        font-family: Arial, Helvetica, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.5;
+      }
+
+      header {
+        padding: 20px 24px 0;
+      }
+
+      header h1 {
+        margin: 0 0 4px;
+        font-size: 1.7rem;
+      }
+
+      .subtitle {
+        color: var(--muted);
+        margin-bottom: 6px;
+      }
+
+      .status-line {
+        color: var(--muted);
+        font-size: 0.85rem;
+        margin-bottom: 16px;
+      }
+
+      .layout {
+        display: flex;
+        gap: 16px;
+        padding: 0 24px 24px;
+        align-items: flex-start;
+      }
+
+      .sidebar {
+        flex: 0 0 30%;
+        max-width: 30%;
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 14px;
+      }
+
+      .sidebar h2 {
+        margin: 0 0 10px;
+        font-size: 1rem;
+      }
+
+      .query-list {
+        overflow-y: auto;
+        max-height: 70vh;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .query-item {
+        text-align: left;
+        background: var(--green-soft);
+        color: var(--green);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 8px 10px;
+        cursor: pointer;
+        font-size: 0.9rem;
+      }
+
+      .query-item:hover {
+        filter: brightness(0.97);
+      }
+
+      .query-item.active {
+        background: var(--green);
+        color: white;
+      }
+
+      .main-panel {
+        flex: 1 1 70%;
+        max-width: 70%;
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 16px;
+      }
+
+      #sql-input {
+        width: 100%;
+        min-height: 140px;
+        font-family: "Consolas", "Courier New", monospace;
+        font-size: 0.95rem;
+        padding: 10px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        resize: vertical;
+      }
+
+      .button-row {
+        margin-top: 10px;
+        display: flex;
+        gap: 10px;
+      }
+
+      .button-row button {
+        border: none;
+        border-radius: 8px;
+        padding: 8px 16px;
+        font-size: 0.9rem;
+        cursor: pointer;
+      }
+
+      #execute-btn {
+        background: var(--green);
+        color: white;
+      }
+
+      #save-btn {
+        background: #eef2ff;
+        color: #4338ca;
+      }
+
+      .results-label {
+        margin-top: 18px;
+        font-weight: 700;
+        font-size: 0.9rem;
+        color: var(--muted);
+      }
+
+      #results {
+        margin-top: 8px;
+        background: #0f172a;
+        color: #e2e8f0;
+        border-radius: 8px;
+        padding: 12px;
+        font-family: "Consolas", "Courier New", monospace;
+        font-size: 0.85rem;
+        white-space: pre-wrap;
+        word-break: break-word;
+        min-height: 60px;
+      }
+
+      dialog {
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 18px;
+        width: 480px;
+        max-width: 90vw;
+      }
+
+      dialog h3 {
+        margin: 0 0 10px;
+      }
+
+      dialog textarea {
+        width: 100%;
+        min-height: 90px;
+        font-family: "Consolas", "Courier New", monospace;
+        font-size: 0.85rem;
+        padding: 8px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        background: #f8fafc;
+        resize: vertical;
+      }
+
+      dialog label {
+        display: block;
+        margin: 12px 0 4px;
+        font-weight: 700;
+        font-size: 0.85rem;
+      }
+
+      dialog input[type="text"] {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        font-size: 0.9rem;
+      }
+
+      dialog .dialog-actions {
+        margin-top: 16px;
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+      }
+
+      dialog .dialog-actions button {
+        border: none;
+        border-radius: 8px;
+        padding: 8px 16px;
+        font-size: 0.9rem;
+        cursor: pointer;
+      }
+
+      #dialog-confirm {
+        background: var(--green);
+        color: white;
+      }
+
+      #dialog-cancel {
+        background: #f1f5f9;
+        color: var(--text);
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>SQL Sandbox</h1>
+      <div class="subtitle">Experiment with SQLite queries against the data in site-cache.json.</div>
+      <div class="status-line" id="status-line">Loading...</div>
+    </header>
+
+    <div class="layout">
+      <aside class="sidebar">
+        <h2>Saved queries</h2>
+        <div class="query-list" id="query-list"></div>
+      </aside>
+
+      <section class="main-panel">
+        <textarea id="sql-input" spellcheck="false" placeholder="SELECT * FROM posts;"></textarea>
+        <div class="button-row">
+          <button id="execute-btn">Execute</button>
+          <button id="save-btn">Save</button>
+        </div>
+        <div class="results-label">Results</div>
+        <pre id="results">Run a query to see results here.</pre>
+      </section>
+    </div>
+
+    <dialog id="save-dialog">
+      <h3>Save query</h3>
+      <textarea id="save-sql-preview" readonly></textarea>
+      <label for="save-title-input">Friendly title</label>
+      <input type="text" id="save-title-input" placeholder="e.g. Posts tagged free" />
+      <div class="dialog-actions">
+        <button id="dialog-cancel" type="button">Cancel</button>
+        <button id="dialog-confirm" type="button">Save</button>
+      </div>
+    </dialog>
+
+    <script>
+      const STORAGE_KEY = 'sandboxSavedQueries';
+
+      const DEFAULT_QUERIES = [
+        {
+          title: 'All post titles and dates',
+          sql: 'SELECT title, date FROM posts ORDER BY date;',
+        },
+        {
+          title: 'Post count per site',
+          sql: "SELECT s.title AS site, COUNT(*) AS post_count\nFROM posts p\nJOIN sites s ON s.site_id = p.site_id\nGROUP BY s.title;",
+        },
+        {
+          title: "Posts tagged 'free'",
+          sql: "SELECT p.title, p.link\nFROM posts p\nJOIN post_terms pt ON pt.post_id = p.id AND pt.site_id = p.site_id\nJOIN terms t ON t.term_id = pt.term_id AND t.site_id = pt.site_id AND t.kind = pt.kind\nWHERE t.kind = 'tag' AND t.name = 'free';",
+        },
+        {
+          title: 'List tables and fields',
+          sql: "SELECT name, sql FROM sqlite_master WHERE type = 'table';",
+        },
+        {
+          title: 'List all categories',
+          sql: "SELECT site_id, name, slug\nFROM terms\nWHERE kind = 'category'\nORDER BY site_id, name;",
+        },
+      ];
+
+      const state = {
+        db: null,
+      };
+
+      function loadSavedQueries() {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_QUERIES));
+          return DEFAULT_QUERIES.slice();
+        }
+        try {
+          const parsed = JSON.parse(raw);
+          return Array.isArray(parsed) ? parsed : DEFAULT_QUERIES.slice();
+        } catch (error) {
+          return DEFAULT_QUERIES.slice();
+        }
+      }
+
+      function saveSavedQueries(queries) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(queries));
+      }
+
+      function renderQueryList() {
+        const listEl = document.getElementById('query-list');
+        const queries = loadSavedQueries();
+        listEl.innerHTML = '';
+        queries.forEach((query) => {
+          const item = document.createElement('div');
+          item.className = 'query-item';
+          item.textContent = query.title;
+          item.addEventListener('click', () => {
+            document.getElementById('sql-input').value = query.sql;
+          });
+          listEl.appendChild(item);
+        });
+      }
+
+      function buildDatabaseSchema(db) {
+        db.run(`
+          CREATE TABLE sites (
+            site_id TEXT,
+            title TEXT,
+            base_url TEXT,
+            xml_file TEXT,
+            site_order INTEGER
+          );
+
+          CREATE TABLE terms (
+            site_id TEXT,
+            term_id INTEGER,
+            kind TEXT,
+            name TEXT,
+            slug TEXT,
+            description TEXT,
+            parent TEXT
+          );
+
+          CREATE TABLE posts (
+            site_id TEXT,
+            id INTEGER,
+            post_type TEXT,
+            title TEXT,
+            link TEXT,
+            date TEXT,
+            content TEXT,
+            excerpt TEXT,
+            status TEXT,
+            post_name TEXT,
+            row_order INTEGER
+          );
+
+          CREATE TABLE post_terms (
+            site_id TEXT,
+            post_id INTEGER,
+            term_id INTEGER,
+            kind TEXT
+          );
+        `);
+      }
+
+      function loadFromCacheJson(db, cache) {
+        const insertRows = (table, columns, rows) => {
+          if (!Array.isArray(rows)) return;
+          const placeholders = columns.map(() => '?').join(', ');
+          const sql = `INSERT INTO ${table} (${columns.join(', ')}) VALUES (${placeholders})`;
+          rows.forEach((row) => {
+            db.run(sql, columns.map((col) => (row[col] === undefined ? null : row[col])));
+          });
+        };
+
+        insertRows('sites', ['site_id', 'title', 'base_url', 'xml_file', 'site_order'], cache.sites);
+        insertRows('terms', ['site_id', 'term_id', 'kind', 'name', 'slug', 'description', 'parent'], cache.terms);
+        insertRows('posts', ['site_id', 'id', 'post_type', 'title', 'link', 'date', 'content', 'excerpt', 'status', 'post_name', 'row_order'], cache.posts);
+        insertRows('post_terms', ['site_id', 'post_id', 'term_id', 'kind'], cache.post_terms);
+      }
+
+      function formatResults(result) {
+        if (!result || !result.length) {
+          return '(no rows returned)';
+        }
+        const { columns, values } = result[0];
+        const lines = [columns.join(' | ')];
+        lines.push(columns.map(() => '---').join(' | '));
+        values.forEach((row) => {
+          lines.push(row.map((cell) => (cell === null ? 'NULL' : String(cell))).join(' | '));
+        });
+        return lines.join('\n');
+      }
+
+      function runQuery() {
+        const resultsEl = document.getElementById('results');
+        const sql = document.getElementById('sql-input').value.trim();
+        if (!sql) {
+          resultsEl.textContent = 'Enter a SQL query first.';
+          return;
+        }
+        if (!state.db) {
+          resultsEl.textContent = 'Database is not ready yet.';
+          return;
+        }
+        try {
+          const result = state.db.exec(sql);
+          resultsEl.textContent = formatResults(result);
+        } catch (error) {
+          resultsEl.textContent = `Error: ${error.message}`;
+        }
+      }
+
+      function openSaveDialog() {
+        const sql = document.getElementById('sql-input').value.trim();
+        if (!sql) return;
+        document.getElementById('save-sql-preview').value = sql;
+        document.getElementById('save-title-input').value = '';
+        document.getElementById('save-dialog').showModal();
+      }
+
+      function confirmSaveDialog() {
+        const title = document.getElementById('save-title-input').value.trim();
+        const sql = document.getElementById('save-sql-preview').value;
+        if (!title) return;
+        const queries = loadSavedQueries();
+        queries.push({ title, sql });
+        saveSavedQueries(queries);
+        renderQueryList();
+        document.getElementById('save-dialog').close();
+      }
+
+      document.getElementById('execute-btn').addEventListener('click', runQuery);
+      document.getElementById('save-btn').addEventListener('click', openSaveDialog);
+      document.getElementById('dialog-cancel').addEventListener('click', () => {
+        document.getElementById('save-dialog').close();
+      });
+      document.getElementById('dialog-confirm').addEventListener('click', confirmSaveDialog);
+
+      async function startApp() {
+        const statusEl = document.getElementById('status-line');
+        try {
+          const SQL = await initSqlJs({
+            locateFile: (file) => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.13.0/${file}`,
+          });
+
+          const db = new SQL.Database();
+          buildDatabaseSchema(db);
+
+          const response = await fetch('./site-cache.json', { cache: 'no-store' });
+          if (!response.ok) throw new Error('site-cache.json could not be fetched');
+          const cache = await response.json();
+          loadFromCacheJson(db, cache);
+
+          state.db = db;
+          const postCount = db.exec('SELECT COUNT(*) FROM posts')[0].values[0][0];
+          statusEl.textContent = `Loaded ${postCount} posts/pages from site-cache.json.`;
+        } catch (error) {
+          console.error(error);
+          statusEl.textContent = 'Failed to load site-cache.json into the sandbox database.';
+        }
+
+        renderQueryList();
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', startApp, { once: true });
+      } else {
+        startApp();
+      }
+    </script>
+  </body>
+</html>
