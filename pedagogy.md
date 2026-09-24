@@ -318,6 +318,62 @@ GitHub Pages or `raw.githubusercontent.com`.
   even though it's instructor-authored, because the intent is for students
   to copy and override it locally, not treat it as an untouchable
   contract.
+- **`siteN/images/` and `siteN/media-manifest.json`** — see the dedicated
+  subsection below; these are given, read-only, but for performance
+  reasons (not editability reasons) they should stay local rather than
+  move to the hosted split above.
+
+### Where should the media (`siteN/images/`, `media-manifest.json`) live?
+
+**Keep media local, alongside each student's own files — don't host images
+on GitHub Pages/jsDelivr.** This is the right instinct: `site-cache.json`
+and `loader.js` are small, single text files (one HTTP request each,
+cheap either way), but a rendered page can easily show dozens of images at
+once, each of which is its own separate HTTP request no matter where it's
+hosted. Keeping the images local doesn't reduce *how many* requests the
+browser makes — it changes what each one costs:
+
+- **Local (`siteN/images/xyz.jpg` next to `site.html`)** — each `<img>`
+  request is a same-origin disk read (or, under a local dev server, a
+  loopback request), effectively instant, works fully offline, and is
+  completely unaffected by any remote host's rate limits, outages, or CDN
+  cold-start latency.
+- **Remote (hosted on GitHub Pages/jsDelivr)** — each `<img>` request pays
+  a real network round-trip to an external origin. For a handful of images
+  this is barely noticeable, but during active development a student
+  reloads the page constantly (every CSS/JS tweak), and browser caching
+  can't always be relied on to hide this (hard refreshes, dev tools open
+  with "disable cache" ticked, incognito windows, etc. are all common while
+  iterating). Local avoids paying that cost repeatedly for no benefit.
+
+This means the "given" bundle a student receives can't be trimmed down to
+*only* two hosted URLs — it still needs to physically include each
+`siteN/images/` folder, exactly as today. The win from §8's hosting split
+is narrower but still real: the two files that change/need correcting
+centrally (`site-cache.json`, `loader.js`) can be centrally managed,
+while the bulky, static, never-changing media ships once with the starter
+kit, same as now.
+
+**Why the split still works cleanly:** `content` fields inside
+`site-cache.json` already contain `<img src="site1/images/...">` with
+paths *relative to the page that renders them*, not relative to wherever
+`site-cache.json` itself was fetched from — that's just how the browser
+resolves relative URLs in the DOM. So even if `site-cache.json` is fetched
+from a hosted URL, the `<img>` tags inside its `content` strings still
+resolve against the student's own `site.html`/`siteN/images/` folder,
+because that's the document actually rendering them. No path-rewriting
+change is needed to support a "hosted JSON, local images" split.
+
+**`media-manifest.json` is build-time only, not a runtime dependency.**
+It's consumed once, by the instructor-side tooling that produces
+`site-cache.json` (mapping each original WordPress upload path to its
+flattened local filename and rewriting `<img src>` accordingly) — by the
+time a student's `loader.js` loads `site-cache.json`, the image paths are
+already baked in, and `media-manifest.json` is never read again. It's fine
+(and mildly useful as a debugging reference — "why didn't this image
+show up?") to keep shipping it alongside `siteN/images/`, but it could
+also be dropped from the student bundle entirely without breaking
+anything, if you'd rather keep the starter kit leaner.
 
 ### Practical notes if you do this
 
@@ -399,3 +455,6 @@ GitHub Pages or `raw.githubusercontent.com`.
    host you already use for this module? And should the hosted URL be
    pinned per-assignment (e.g. a git tag per coursework release) so a
    later fix never silently changes what an already-submitted site shows?
+8. Media bundling: keep shipping `media-manifest.json` alongside
+   `siteN/images/` for every student (useful as a debugging reference) or
+   drop it from the student-facing bundle since it's not read at runtime?
