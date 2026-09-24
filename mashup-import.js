@@ -128,7 +128,8 @@ function buildDatabaseSchema(db) {
       excerpt TEXT,
       status TEXT,
       post_name TEXT,
-      row_order INTEGER
+      row_order INTEGER,
+      isPublic BOOLEAN DEFAULT TRUE
     );
 
     CREATE TABLE post_terms (
@@ -278,18 +279,22 @@ function rowsToObjects(result) {
 }
 
 function loadFromCacheJson(db, cache) {
-  const insertRows = (table, columns, rows) => {
+  const insertRows = (table, columns, rows, defaults = {}) => {
     if (!Array.isArray(rows)) return;
     const placeholders = columns.map(() => '?').join(', ');
     const sql = `INSERT INTO ${table} (${columns.join(', ')}) VALUES (${placeholders})`;
     rows.forEach((row) => {
-      db.run(sql, columns.map((col) => (row[col] === undefined ? null : row[col])));
+      db.run(sql, columns.map((col) => {
+        const value = row[col];
+        if (value === undefined) return defaults[col] !== undefined ? defaults[col] : null;
+        return typeof value === 'boolean' ? (value ? 1 : 0) : value;
+      }));
     });
   };
 
   insertRows('sites', ['site_id', 'title', 'base_url', 'xml_file', 'site_order'], cache.sites);
   insertRows('terms', ['site_id', 'term_id', 'kind', 'name', 'slug', 'description', 'parent'], cache.terms);
-  insertRows('posts', ['site_id', 'id', 'post_type', 'title', 'link', 'date', 'content', 'excerpt', 'status', 'post_name', 'row_order'], cache.posts);
+  insertRows('posts', ['site_id', 'id', 'post_type', 'title', 'link', 'date', 'content', 'excerpt', 'status', 'post_name', 'row_order', 'isPublic'], cache.posts, { isPublic: 1 });
   insertRows('post_terms', ['site_id', 'post_id', 'term_id', 'kind'], cache.post_terms);
 }
 
@@ -299,7 +304,7 @@ function exportCacheObject() {
     generatedAt: new Date().toISOString(),
     sites: rowsToObjects(db.exec('SELECT site_id, title, base_url, xml_file, site_order FROM sites ORDER BY site_order')),
     terms: rowsToObjects(db.exec('SELECT site_id, term_id, kind, name, slug, description, parent FROM terms')),
-    posts: rowsToObjects(db.exec('SELECT site_id, id, post_type, title, link, date, content, excerpt, status, post_name, row_order FROM posts')),
+    posts: rowsToObjects(db.exec('SELECT site_id, id, post_type, title, link, date, content, excerpt, status, post_name, row_order, isPublic FROM posts')),
     post_terms: rowsToObjects(db.exec('SELECT site_id, post_id, term_id, kind FROM post_terms')),
   };
 }

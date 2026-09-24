@@ -283,6 +283,10 @@
           title: 'List all categories',
           sql: "SELECT site_id, name, slug\nFROM terms\nWHERE kind = 'category'\nORDER BY site_id, name;",
         },
+        {
+          title: 'Pages only',
+          sql: "SELECT p.title, p.link, p.date\nFROM posts p\nWHERE p.post_type = 'page'\nORDER BY p.date;",
+        },
       ];
 
       const state = {
@@ -353,7 +357,8 @@
             excerpt TEXT,
             status TEXT,
             post_name TEXT,
-            row_order INTEGER
+            row_order INTEGER,
+            isPublic BOOLEAN DEFAULT TRUE
           );
 
           CREATE TABLE post_terms (
@@ -366,18 +371,22 @@
       }
 
       function loadFromCacheJson(db, cache) {
-        const insertRows = (table, columns, rows) => {
+        const insertRows = (table, columns, rows, defaults = {}) => {
           if (!Array.isArray(rows)) return;
           const placeholders = columns.map(() => '?').join(', ');
           const sql = `INSERT INTO ${table} (${columns.join(', ')}) VALUES (${placeholders})`;
           rows.forEach((row) => {
-            db.run(sql, columns.map((col) => (row[col] === undefined ? null : row[col])));
+            db.run(sql, columns.map((col) => {
+              const value = row[col];
+              if (value === undefined) return defaults[col] !== undefined ? defaults[col] : null;
+              return typeof value === 'boolean' ? (value ? 1 : 0) : value;
+            }));
           });
         };
 
         insertRows('sites', ['site_id', 'title', 'base_url', 'xml_file', 'site_order'], cache.sites);
         insertRows('terms', ['site_id', 'term_id', 'kind', 'name', 'slug', 'description', 'parent'], cache.terms);
-        insertRows('posts', ['site_id', 'id', 'post_type', 'title', 'link', 'date', 'content', 'excerpt', 'status', 'post_name', 'row_order'], cache.posts);
+        insertRows('posts', ['site_id', 'id', 'post_type', 'title', 'link', 'date', 'content', 'excerpt', 'status', 'post_name', 'row_order', 'isPublic'], cache.posts, { isPublic: 1 });
         insertRows('post_terms', ['site_id', 'post_id', 'term_id', 'kind'], cache.post_terms);
       }
 
