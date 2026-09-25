@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SQL Sandbox: site-cache.json</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.13.0/sql-wasm.js"></script>
+    <script src="https://stivb.github.io/wpimport/loader.js"></script>
+    <link rel="stylesheet" href="starter.css" />
+    <style>
+      .layout {
+        display: flex;
+        gap: 16px;
+        padding: 0 20px 24px;
+        align-items: flex-start;
+      }
+
+      .sidebar {
+        flex: 0 0 30%;
+        max-width: 30%;
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 14px;
+      }
+
+      .sidebar h2 {
+        margin: 0 0 10px;
+        font-size: 1rem;
+      }
+
+      .query-list {
+        overflow-y: auto;
+        max-height: 70vh;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .query-item {
+        text-align: left;
+        background: var(--green-soft);
+        color: var(--green);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 8px 10px;
+        cursor: pointer;
+        font-size: 0.9rem;
+      }
+
+      .query-item:hover {
+        filter: brightness(0.97);
+      }
+
+      .main-panel {
+        flex: 1 1 70%;
+        max-width: 70%;
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 16px;
+      }
+
+      #sql-input {
+        width: 100%;
+        min-height: 140px;
+        font-family: "Consolas", "Courier New", monospace;
+        font-size: 0.95rem;
+        padding: 10px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        resize: vertical;
+      }
+
+      .button-row {
+        margin-top: 10px;
+        display: flex;
+        gap: 10px;
+      }
+
+      .button-row button {
+        border: none;
+        border-radius: 8px;
+        padding: 8px 16px;
+        font-size: 0.9rem;
+        cursor: pointer;
+      }
+
+      #execute-btn {
+        background: var(--green);
+        color: white;
+      }
+
+      .results-label {
+        margin-top: 18px;
+        font-weight: 700;
+        font-size: 0.9rem;
+        color: var(--muted);
+      }
+
+      #results {
+        margin-top: 8px;
+        background: #0f172a;
+        color: #e2e8f0;
+        border-radius: 8px;
+        padding: 12px;
+        font-family: "Consolas", "Courier New", monospace;
+        font-size: 0.85rem;
+        white-space: pre-wrap;
+        word-break: break-word;
+        min-height: 60px;
+      }
+    </style>
+  </head>
+  <body>
+    <header style="padding: 20px 20px 0">
+      <h1>SQL Sandbox</h1>
+      <div class="subtitle">Experiment with SQL against the shared dataset before writing site.html.</div>
+      <div class="status-line" id="status-line">Loading...</div>
+    </header>
+
+    <div class="layout">
+      <aside class="sidebar">
+        <h2>Saved queries</h2>
+        <div class="query-list" id="query-list"></div>
+      </aside>
+
+      <section class="main-panel">
+        <textarea id="sql-input" spellcheck="false" placeholder="SELECT * FROM posts;"></textarea>
+        <div class="button-row">
+          <button id="execute-btn">Execute</button>
+        </div>
+        <div class="results-label">Results</div>
+        <pre id="results">Run a query to see results here.</pre>
+      </section>
+    </div>
+
+    <script>
+      const DEFAULT_QUERIES = [
+        {
+          title: 'List tables and fields',
+          sql: "SELECT name, sql FROM sqlite_master WHERE type = 'table';",
+        },
+        {
+          title: 'All visible post titles and dates',
+          sql: "SELECT title, date FROM posts WHERE isPublic = 1 ORDER BY date;",
+        },
+        {
+          title: 'Post count per site',
+          sql: "SELECT s.title AS site, COUNT(*) AS post_count\nFROM posts p\nJOIN sites s ON s.site_id = p.site_id\nWHERE p.isPublic = 1\nGROUP BY s.title;",
+        },
+        {
+          title: 'List all categories',
+          sql: "SELECT site_id, name, slug\nFROM terms\nWHERE kind = 'category'\nORDER BY site_id, name;",
+        },
+        {
+          title: 'Posts joined to their categories',
+          sql: "SELECT p.title, p.date, t.name AS category\nFROM posts p\nJOIN post_terms pt ON pt.post_id = p.id AND pt.site_id = p.site_id AND pt.kind = 'category'\nJOIN terms t ON t.term_id = pt.term_id AND t.site_id = pt.site_id AND t.kind = 'category'\nWHERE p.isPublic = 1\nORDER BY p.date;",
+        },
+      ];
+
+      const state = { db: null };
+
+      function renderQueryList() {
+        const listEl = document.getElementById('query-list');
+        listEl.innerHTML = '';
+        DEFAULT_QUERIES.forEach((query) => {
+          const item = document.createElement('div');
+          item.className = 'query-item';
+          item.textContent = query.title;
+          item.addEventListener('click', () => {
+            document.getElementById('sql-input').value = query.sql;
+          });
+          listEl.appendChild(item);
+        });
+      }
+
+      function formatResults(result) {
+        if (!result || !result.length) {
+          return '(no rows returned)';
+        }
+        const { columns, values } = result[0];
+        const lines = [columns.join(' | ')];
+        lines.push(columns.map(() => '---').join(' | '));
+        values.forEach((row) => {
+          lines.push(row.map((cell) => (cell === null ? 'NULL' : String(cell))).join(' | '));
+        });
+        return lines.join('\n');
+      }
+
+      function runQuery() {
+        const resultsEl = document.getElementById('results');
+        const sql = document.getElementById('sql-input').value.trim();
+        if (!sql) {
+          resultsEl.textContent = 'Enter a SQL query first.';
+          return;
+        }
+        if (!state.db) {
+          resultsEl.textContent = 'Database is not ready yet.';
+          return;
+        }
+        try {
+          const result = state.db.exec(sql);
+          resultsEl.textContent = formatResults(result);
+        } catch (error) {
+          resultsEl.textContent = `Error: ${error.message}`;
+        }
+      }
+
+      document.getElementById('execute-btn').addEventListener('click', runQuery);
+
+      async function startApp() {
+        const statusEl = document.getElementById('status-line');
+        try {
+          const { db, curation } = await Loader.initializeDatabase();
+          state.db = db;
+
+          if (curation.error) {
+            statusEl.textContent = `Loaded, but curation.sql failed to run: ${curation.error}`;
+            statusEl.classList.add('error');
+          } else {
+            statusEl.textContent = curation.applied
+              ? 'Loaded site-cache.json and applied curation.sql.'
+              : 'Loaded site-cache.json (no curation.sql applied).';
+          }
+        } catch (error) {
+          statusEl.textContent = `Failed to load data: ${error.message}`;
+          statusEl.classList.add('error');
+        }
+      }
+
+      renderQueryList();
+      startApp();
+    </script>
+  </body>
+</html>

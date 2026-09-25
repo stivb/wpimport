@@ -1,0 +1,24 @@
+-- curation.sql — this is YOUR editorial decision, expressed as SQL.
+--
+-- loader.js fetches this file and runs it (via db.exec) immediately after
+-- site-cache.json has been loaded, and before anything else on the page
+-- runs. That means your UPDATE/DELETE statements here are what decide what
+-- a marker opening your submission cold will actually see.
+--
+-- The isPublic column on `posts` is the recommended way to hide content
+-- without deleting rows: filter your own SELECT queries elsewhere with
+-- `WHERE isPublic = 1` (or simply not select isPublic = 0 rows).
+--
+-- Examples (edit/replace these with your own editorial decisions):
+--
+-- Hide a specific post by its post_name:
+-- UPDATE posts SET isPublic = 0 WHERE post_name = 'some-draft-post';
+--
+-- Hide everything from one site that matches a pattern:
+-- UPDATE posts SET isPublic = 0 WHERE site_id = 'site2' AND title LIKE '%old%';
+--
+-- Make a small wording edit to a title so it reads better out of context:
+-- UPDATE posts SET title = 'A tidier title' WHERE site_id = 'site1' AND id = 123;
+
+-- (leave this file syntactically valid SQL even if you have no changes yet —
+--  an empty file, or a file containing only comments, is fine)

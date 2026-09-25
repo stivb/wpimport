@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Mashup Site</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.13.0/sql-wasm.js"></script>
+    <script src="https://stivb.github.io/wpimport/loader.js"></script>
+    <link rel="stylesheet" href="starter.css" />
+  </head>
+  <body>
+    <main>
+      <h1>My Mashup Site</h1>
+      <div class="subtitle">TODO: replace this with a subtitle that matches your persona.</div>
+      <div class="status-line" id="status-line">Loading...</div>
+
+      <!-- TODO: add filter pills here once you decide your navigation
+           (e.g. by category, by tag, by site) — see starter.css .pill / .pill-row -->
+      <div id="filters"></div>
+
+      <!-- This is where your rendered posts/pages go. -->
+      <div id="content" class="grid"></div>
+    </main>
+
+    <script>
+      const state = { db: null };
+
+      // TODO: replace this query with whatever your persona/curation needs
+      // (e.g. filter by category/tag, join in a specific site, etc.)
+      const DEFAULT_QUERY = `
+        SELECT site_id, id, title, date, excerpt, link
+        FROM posts
+        WHERE isPublic = 1
+        ORDER BY date DESC
+      `;
+
+      function renderPosts(rows) {
+        const contentEl = document.getElementById('content');
+        if (!rows.length) {
+          contentEl.innerHTML = '<p>No posts to show.</p>';
+          return;
+        }
+
+        // TODO: this is a minimal card render — restyle/restructure freely.
+        contentEl.innerHTML = rows.map((row) => `
+          <article class="card">
+            <h2>${Loader.escapeHtml(row.title)}</h2>
+            <div class="meta">${Loader.escapeHtml(Loader.formatDate(row.date))}</div>
+            <p>${Loader.escapeHtml(row.excerpt)}</p>
+          </article>
+        `).join('');
+      }
+
+      function rowsToObjects(result) {
+        if (!result || !result[0]) return [];
+        const { columns, values } = result[0];
+        return values.map((row) => {
+          const obj = {};
+          columns.forEach((col, idx) => { obj[col] = row[idx]; });
+          return obj;
+        });
+      }
+
+      async function startApp() {
+        const statusEl = document.getElementById('status-line');
+        try {
+          const { db, curation } = await Loader.initializeDatabase();
+          state.db = db;
+
+          if (curation.error) {
+            statusEl.textContent = `Loaded, but curation.sql failed to run: ${curation.error}`;
+            statusEl.classList.add('error');
+          } else {
+            statusEl.textContent = curation.applied
+              ? 'Loaded site-cache.json and applied curation.sql.'
+              : 'Loaded site-cache.json (no curation.sql applied).';
+          }
+
+          const rows = rowsToObjects(db.exec(DEFAULT_QUERY));
+          renderPosts(rows);
+        } catch (error) {
+          statusEl.textContent = `Failed to load data: ${error.message}`;
+          statusEl.classList.add('error');
+        }
+      }
+
+      startApp();
+    </script>
+  </body>
+</html>
