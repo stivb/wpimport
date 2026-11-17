@@ -7,7 +7,7 @@ from pathlib import Path
 from unittest.mock import patch
 from urllib.error import URLError
 
-import extract_media
+import precursor.extract_media as extract_media
 
 
 XML = '''<rss xmlns:wp="http://wordpress.org/export/1.2/"

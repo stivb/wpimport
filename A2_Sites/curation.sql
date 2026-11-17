@@ -12,9 +12,9 @@ UPDATE posts SET isPublic = 0 WHERE post_name = 'about';
 -- These four site2 posts are WordPress's own demo content (left over from
 -- "Get Fit In Herts" being newly created) — not about fitness or Herts at
 -- all, so they'd confuse a visitor looking for real activities.
-UPDATE posts SET isPublic = 0
-WHERE site_id = 'site2'
-  AND post_name IN ('the-art-of-connection', 'beyond-the-obstacle', 'growth-unlocked', 'collaboration-magic');
+-- UPDATE posts SET isPublic = 0
+-- WHERE site_id = 'site2'
+-- AND post_name IN ('the-art-of-connection', 'beyond-the-obstacle', 'growth-unlocked', 'collaboration-magic');
 
 -- These pages only contained WordPress "page list" / "latest posts" blocks
 -- (categories/navigation widgets that only work inside WordPress itself);
@@ -27,4 +27,8 @@ WHERE post_type = 'page'
 
 -- The homepage slideshow post had no title at all — give it one so it
 -- reads sensibly as a card instead of showing a blank heading.
-UPDATE posts SET title = 'Home page highlights' WHERE site_id = 'site1' AND id = 88;
+--UPDATE posts SET title = 'Home page highlights' WHERE site_id = 'site1' AND id = 88;
+
+-- Hide posts or pages whose title or body indicates food-related content.
+UPDATE posts SET isPublic = 0
+WHERE LOWER(title) LIKE '%food%'
