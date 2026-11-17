@@ -1,20 +1,18 @@
 -- curation.sql — editorial decisions for "Family Days Out in Herts"
 --
--- Persona (see persona.md): a Hertfordshire parent looking for free,
--- family-friendly things to do outdoors, plus the odd fitness class.
--- They don't care about WordPress's own boilerplate, empty navigation
--- pages, or duplicate/near-duplicate entries — so those are hidden below.
+-- Persona (see persona.md): an international student who wants affordable
+-- outdoor activities, local parks and walks, and relevant fitness/wellness
+-- information. Keep the content focused and quick to browse.
 
--- WordPress adds the exact same instructional "About" text to every new
--- site by default; it isn't real content for either site here.
-UPDATE posts SET isPublic = 0 WHERE post_name = 'about';
+-- WordPress's default About page is boilerplate, not local activity content.
+UPDATE posts SET isPublic = 0 WHERE LOWER(post_name) = 'about';
 
--- These four site2 posts are WordPress's own demo content (left over from
--- "Get Fit In Herts" being newly created) — not about fitness or Herts at
--- all, so they'd confuse a visitor looking for real activities.
--- UPDATE posts SET isPublic = 0
--- WHERE site_id = 'site2'
--- AND post_name IN ('the-art-of-connection', 'beyond-the-obstacle', 'growth-unlocked', 'collaboration-magic');
+-- These site2 entries are generic WordPress demo posts, not local fitness,
+-- wellness, or outdoor information.
+UPDATE posts SET isPublic = 0
+WHERE site_id = 'site2'
+  AND post_name IN ('the-art-of-connection', 'beyond-the-obstacle',
+                    'growth-unlocked', 'collaboration-magic');
 
 -- These pages only contained WordPress "page list" / "latest posts" blocks
 -- (categories/navigation widgets that only work inside WordPress itself);
@@ -25,10 +23,23 @@ WHERE post_type = 'page'
   AND post_name IN ('social-groups', 'by-region', 'walking', 'welwyn-and-hatfield',
                      'st-albans', 'tring', 'parks', 'gyms', 'outdoors', 'free');
 
--- The homepage slideshow post had no title at all — give it one so it
--- reads sensibly as a card instead of showing a blank heading.
---UPDATE posts SET title = 'Home page highlights' WHERE site_id = 'site1' AND id = 88;
-
--- Hide posts or pages whose title or body indicates food-related content.
+-- Hide explicit food recommendations, restaurant reviews, and indoor dining
+-- without excluding general health or nutrition advice that may be useful.
 UPDATE posts SET isPublic = 0
-WHERE LOWER(title) LIKE '%food%'
+WHERE LOWER(title) LIKE '%restaurant%'
+   OR LOWER(title) LIKE '%cafe%'
+   OR LOWER(title) LIKE '%café%'
+   OR LOWER(title) LIKE '%dining%'
+   OR LOWER(title) LIKE '%food recommendation%'
+   OR LOWER(title) LIKE '%food review%'
+   OR LOWER(title) LIKE '%places to eat%'
+   OR LOWER(title) LIKE '%where to eat%'
+   OR LOWER(content) LIKE '%restaurant review%'
+   OR LOWER(content) LIKE '%restaurant recommendation%'
+   OR LOWER(content) LIKE '%cafe review%'
+   OR LOWER(content) LIKE '%food recommendation%'
+   OR LOWER(content) LIKE '%food review%'
+   OR LOWER(content) LIKE '%indoor dining%'
+   OR LOWER(content) LIKE '%dining out%'
+   OR LOWER(content) LIKE '%places to eat%'
+   OR LOWER(content) LIKE '%where to eat%';
