@@ -15,7 +15,7 @@
  *
  * Usage (in site.html / sandbox.html):
  *   <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.13.0/sql-wasm.js"></script>
- *   <script src="https://stivb.github.io/wpimport/loader.js"></script>
+ *   <script src="https://stivb.github.io/wpimport/A2_Sites/loader.js"></script>
  *   <script>
  *     Loader.initializeDatabase().then(({ db, cache, curation }) => {
  *       // db is a ready sql.js Database, curation.js already applied.
@@ -26,7 +26,7 @@
 (function (global) {
   'use strict';
 
-  const DEFAULT_CACHE_URL = 'https://stivb.github.io/wpimport/site-cache.json';
+  const DEFAULT_CACHE_URL = 'https://stivb.github.io/wpimport/A2_Sites/site-cache.json';
   const DEFAULT_CURATION_URL = './curation.sql';
   const SQL_JS_CDN = 'https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.13.0/';
 
