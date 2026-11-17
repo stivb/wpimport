@@ -1,0 +1,7 @@
+Herts Wellbeing Blog - WordPress sites demonstrated
+
+Public viewing password (all sites): 5com2009
+
+Prototype site 1: https://hertswellbeingcom.wordpress.com/
+Prototype site 2: https://hertswellbeing2.wordpress.com/
+Final site:       https://hertswellbeingblog.wpcomstaging.com/

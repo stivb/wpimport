@@ -1,0 +1,131 @@
+/* starter.css — given, small set of variables + card/grid/pill primitives.
+   Feel free to override or extend any of this; it's a starting point, not a contract. */
+
+:root {
+  --bg: #f4f7f1;
+  --panel: #ffffff;
+  --text: #1f2937;
+  --muted: #6b7280;
+  --border: #dfe7d7;
+  --green: #2f7d4a;
+  --green-soft: #eaf5ee;
+  --blue: #1d4ed8;
+  --blue-soft: #e0ebff;
+  --amber: #b45309;
+  --amber-soft: #fef3c7;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+}
+
+main {
+  max-width: 1100px;
+  margin: 32px auto;
+  padding: 0 20px 40px;
+}
+
+h1 {
+  margin: 0 0 12px;
+  font-size: 2.1rem;
+}
+
+.subtitle {
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+
+.status-line {
+  color: var(--muted);
+  font-size: 0.9rem;
+  margin-bottom: 22px;
+}
+
+.status-line.error {
+  color: #b91c1c;
+}
+
+/* Card: a single content block (e.g. one post/page). */
+.card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 22px 24px;
+  margin-bottom: 20px;
+}
+
+.card h2 {
+  margin: 0 0 6px;
+  font-size: 1.3rem;
+}
+
+.card .meta {
+  color: var(--muted);
+  font-size: 0.85rem;
+  margin-bottom: 12px;
+}
+
+/* Grid: lay several cards out side by side. */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+/* Pill: small rounded label/button, e.g. for filters or tags. */
+.pill {
+  display: inline-block;
+  border: 1px solid var(--border);
+  background: var(--green-soft);
+  color: var(--green);
+  border-radius: 999px;
+  padding: 6px 10px;
+  text-decoration: none;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.pill.active {
+  background: var(--green);
+  color: white;
+  border-color: var(--green);
+}
+
+.pill.tag {
+  background: var(--blue-soft);
+  color: var(--blue);
+  border-color: #bfd4ff;
+}
+
+.pill.tag.active {
+  background: var(--blue);
+  color: white;
+  border-color: var(--blue);
+}
+
+.pill.site {
+  background: var(--amber-soft);
+  color: var(--amber);
+  border-color: #fcd9a3;
+}
+
+.pill.site.active {
+  background: var(--amber);
+  color: white;
+  border-color: var(--amber);
+}
+
+.pill-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 14px;
+}

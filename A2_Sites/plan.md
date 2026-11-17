@@ -1,0 +1,392 @@
+# Plan: Generalising the importer to multiple WordPress site exports
+
+## 0. What I understand you're asking for
+
+Right now the app (per [context.md](context.md)) imports **one** WordPress
+`.xml` export into an in-browser SQLite database via [jsimport.js](jsimport.js),
+and [outdoorsinherts.html](outdoorsinherts.html) renders it.
+
+You want to generalise this so that:
+
+1. The workspace root contains a series of sibling folders `site1/`, `site2/`,
+   `site3/`, … `siteN/` (confirmed present: [site1](site1) and [site2](site2)).
+2. Each `siteN/` folder contains:
+   - one WordPress export `.xml` file (filename varies — e.g.
+     [site1/export.xml](site1/export.xml) vs
+     [site2/getfitinherts.WordPress.2026-09-22.xml](site2/getfitinherts.WordPress.2026-09-22.xml)),
+   - one `.tar` file containing that site's media library (e.g.
+     [site1/media-export-226499940-from-0-to-87.tar](site1/media-export-226499940-from-0-to-87.tar)),
+   - (already, manually, in your two examples) an `images/` folder with the
+     tar contents extracted and flattened.
+3. The importer should load **all** `siteN` folders it finds, into one shared
+   SQLite database, tagging every row with which site it came from, so a
+   query can filter/aggregate across sites or restrict to one.
+4. A new page, [mashup.html](mashup.html), should render the combined content
+   (starting with site1 + site2, but written so it scales to any number of
+   sites without code changes).
+5. The `.tar` → `images/` extraction step you did by hand for site1/site2
+   should become an automated step, and image URLs inside the imported HTML
+   content should be rewritten to point at the local extracted copy when one
+   exists, falling back to the original `https://*.wordpress.com/...` URL
+   when it doesn't (missing file, or ambiguous match).
+6. You want an opinion on whether WordPress's `YYYY/MM/` media folder
+   convention needs to be preserved locally, or whether a flat folder is
+   fine.
+
+I answer/plan each of these below as three parts, plus open questions I need
+you to resolve before implementation.
+
+---
+
+## Part 1 — Multi-site import in `jsimport.js`
+
+### 1.1 Current shape (single site)
+
+[jsimport.js](jsimport.js) today:
+- hardcodes `XML_URL = './site1/outdoorsinherts.WordPress.2026-09-03.xml'`,
+- creates three tables with **no site concept**: `terms`, `posts`,
+  `post_terms`,
+- keys `terms`/`posts` on the raw WordPress `term_id` / `post_id`, which are
+  only unique **within one export**, not across exports.
+
+If we import two sites unchanged, `term_id`/`post_id` collisions are
+guaranteed (WordPress.com starts IDs from small integers on every new site —
+site2's `Uncategorized` category is `term_id 97`, same as site1's).
+
+### 1.2 Schema change: add a `sites` table and a `site_id` column everywhere
+
+```sql
+CREATE TABLE sites (
+  site_id TEXT,        -- the folder name, e.g. 'site1', 'site2' (stable, human-readable, unique)
+  title TEXT,          -- from <channel><title>
+  base_url TEXT,       -- from <channel><link> / wp:base_blog_url
+  xml_file TEXT,        -- resolved filename actually used, for diagnostics
+  imported_at TEXT
+);
+
+CREATE TABLE terms (
+  site_id TEXT,
+  term_id INTEGER,     -- original WP term_id, unique only per site
+  kind TEXT,
+  name TEXT,
+  slug TEXT,
+  description TEXT,
+  parent TEXT
+);
+
+CREATE TABLE posts (
+  site_id TEXT,
+  id INTEGER,          -- original WP post_id, unique only per site
+  title TEXT,
+  link TEXT,
+  date TEXT,
+  content TEXT,
+  excerpt TEXT,
+  status TEXT,
+  post_name TEXT,
+  row_order INTEGER    -- keeps import order within a site; combine with site_id/date for global ordering
+);
+
+CREATE TABLE post_terms (
+  site_id TEXT,
+  post_id INTEGER,
+  term_id INTEGER,
+  kind TEXT
+);
+```
+
+Every join that currently matches on `term_id`/`post_id` alone must be
+extended to also match `site_id`, e.g.:
+
+```sql
+SELECT p.*
+FROM posts p
+JOIN post_terms pt ON pt.post_id = p.id AND pt.site_id = p.site_id AND pt.kind = 'category'
+JOIN terms t ON t.term_id = pt.term_id AND t.site_id = pt.site_id AND t.kind = pt.kind
+WHERE t.name = ? AND t.site_id = ?   -- or omit the site_id filter to aggregate across sites
+```
+
+This is a mechanical but pervasive change (every `db.exec`/`db.run` in
+[jsimport.js](jsimport.js) and both HTML pages).
+
+I'd also add one convenience computed value in JS (not stored in SQL) for
+UI code that needs a single unique key per post: `` `${site_id}:${id}` ``.
+This avoids inventing a surrogate autoincrement key while still giving a
+collision-free identifier for `<article>` DOM keys, links, etc.
+
+### 1.3 Discovering the `siteN` folders automatically
+
+There's no JS API to "list a directory" on a static file server. Two
+realistic options, and I recommend supporting both with a fallback chain:
+
+**Option A — parse the directory index (works today with `python -m
+http.server`).** When you `fetch('./')`, `python -m http.server` returns an
+autogenerated HTML page listing the folder's contents as `<a href="site1/">`
+links. We can `fetch('./')`, parse the response as HTML, and collect every
+`href` matching `^site(\d+)/$`. This needs **zero maintenance** — drop in
+`site3/` and it's picked up automatically. Caveat: this only works because
+the dev server auto-generates listings; it will **not** work if you later
+host this on GitHub Pages or another static host that doesn't serve
+directory indexes.
+
+**Option B — sequential probing.** Try `fetch('./site1/')`,
+`fetch('./site2/')`, … incrementing until we hit a 404, stopping after (say)
+the first miss or a generous upper bound (e.g. 50) to avoid an infinite
+loop. Works on any static host, but breaks if numbering has a gap (`site1`,
+`site2`, `site4` — `site4` would never be reached). This matches your stated
+convention (`siteN`, `n` a number) so a gap seems unlikely, but worth
+flagging.
+
+**Option C — explicit manifest** (`sites.json` at the root, e.g. `["site1",
+"site2"]`). Most robust and host-agnostic, but requires you to remember to
+update it when adding a folder.
+
+**Recommendation:** implement Option A first since your current workflow
+already runs a Python dev server; add Option B as an automatic fallback if
+the directory-index fetch fails or returns something unparseable (e.g. a
+different server was used); skip Option C unless you plan to deploy to a
+host without directory listings, in which case flip the default to C. I can
+wire all three in from the start behind one `discoverSites()` function if
+you'd like — the extra code is small.
+
+### 1.4 Discovering the XML/tar filenames inside each `siteN` folder
+
+Filenames aren't fixed (`export.xml` vs
+`getfitinherts.WordPress.2026-09-22.xml`). Same technique as above: fetch
+`./siteN/`, parse the directory listing, and pick:
+- the single `*.xml` file as the export,
+- the single `*.tar` file as the media archive (only needed by the
+  extraction step in Part 3, not by the browser import itself),
+- treat `images/` as the pre-extracted media folder if present.
+
+If a folder has zero or more than one `.xml` file, that site should be
+**skipped with a console warning**, not abort the whole import — one bad
+folder shouldn't take down the aggregated view of everything else.
+
+### 1.5 Refactored import flow (pseudocode)
+
+```
+initializeDatabase():
+  SQL = await initSqlJs(...)
+  buildDatabase(SQL)                 // schema from 1.2
+  siteFolders = await discoverSites()
+  for each folder in siteFolders:
+    try:
+      xmlFilename = await discoverXmlFile(folder)
+      xmlText = await fetch(`${folder}/${xmlFilename}`).then(r => r.text())
+      xmlDoc = parse(xmlText)
+      siteId = folder                 // e.g. 'site1'
+      insertSiteRow(siteId, xmlDoc, xmlFilename)
+      maps = parseCategoriesAndTags(xmlDoc, siteId)
+      insertPosts(xmlDoc, maps, siteId)
+    catch (err):
+      console.warn(`Skipping ${folder}: ${err.message}`)
+  return summary (terms, sites, counts) for the UI
+```
+
+Every helper (`parseCategoriesAndTags`, `insertPosts`, term-count queries,
+`getAllTerms`, etc.) gains a `siteId` parameter/column, per 1.2.
+
+### 1.6 What "filter by originating site" looks like afterwards
+
+Because `site_id` is on every row, the UI can offer a site filter exactly
+like the existing category/tag filter: `SELECT DISTINCT site_id, title FROM
+sites`, render buttons, and add `AND p.site_id = ?` to the post query. This
+composes with category/tag filtering already in place (just add the extra
+`AND`).
+
+---
+
+## Part 2 — `mashup.html`
+
+Modelled closely on [outdoorsinherts.html](outdoorsinherts.html), with these
+differences:
+
+1. **Site filter row**, alongside the existing category/tag rows — "All
+   sites / Site 1 / Site 2 / …", generated from the `sites` table, exactly
+   the same button-and-click pattern already used for categories/tags.
+2. **Site badge per post** — each rendered `<article>` shows which site it
+   came from (e.g. a small pill/label using `sites.title`), since posts from
+   different blogs are now interleaved.
+3. **Ordering across sites** — `row_order` alone only orders posts *within*
+   a site. For a combined chronological feed, order by `p.date` (already
+   stored as text `YYYY-MM-DD HH:MM:SS`, which sorts correctly as a string)
+   with `row_order` as a tiebreaker, instead of `row_order` alone. I'll ask
+   below whether you want combined chronological order or "grouped by site"
+   as the default.
+4. **No hardcoded site count** — the page must not say "site1 and site2"
+   anywhere in code; it renders whatever `sites` table contains, so adding
+   `site3/` later requires no HTML/JS changes, only dropping the folder in
+   place.
+5. Reuses [jsimport.js](jsimport.js) unchanged (after the Part 1 refactor) —
+   `mashup.html` is purely a rendering shell, same separation of concerns
+   already established for [outdoorsinherts.html](outdoorsinherts.html) /
+   [outdoors_starter.html](outdoors_starter.html).
+
+No behavioural surprises here — it's the same rendering pattern you already
+have, extended with one more filter dimension (site) and a visible source
+label per post.
+
+---
+
+## Part 3 — Automating tar extraction + image URL rewriting
+
+### 3.1 Where this step should run
+
+Untarring and rewriting **cannot** happen inside the browser-only workflow
+you have today without adding a client-side tar-parsing library (e.g.
+`js-untar`), because browsers can't write files to disk and can't read
+`.tar` bytes natively. Two viable approaches:
+
+**Approach A — a small offline script (recommended).** A standalone Python
+script (Python's already in your toolchain) that you run once per new site
+folder (or once across all of them) before opening the page:
+1. Find the `.tar` file in `siteN/`.
+2. Extract every regular file **flattened** into `siteN/images/` (see 3.3 for
+   the flat-vs-month recommendation), skipping directory entries.
+3. On a filename collision (two different source paths reducing to the same
+   basename — e.g. `2023/11/photo.jpg` and `2024/03/photo.jpg`), keep the
+   first, and rename subsequent collisions with a short disambiguating
+   suffix (e.g. `photo-2.jpg`), recording the rename.
+4. Write a manifest `siteN/media-manifest.json`:
+   ```json
+   {
+     "site_id": "site1",
+     "files": {
+       "wendover_woods.jpg": "images/wendover_woods.jpg",
+       "photo.jpg": "images/photo.jpg",
+       "photo-2.jpg": "images/photo-2.jpg"
+     }
+   }
+   ```
+   This is what the browser-side importer reads to know what's actually
+   available locally — it never needs to look inside the `.tar` itself.
+
+This mirrors exactly what you already did by hand for site1/site2, just
+scripted and repeatable, and it keeps the browser-side code simple (a JSON
+fetch instead of a tar parser).
+
+**Approach B — live in-browser untar.** Fetch the `.tar` as
+`arrayBuffer()`, parse it with a small pure-JS untar library, and create
+`URL.createObjectURL(blob)` references per file, entirely in memory (no
+`media-manifest.json`, no pre-extraction step). This avoids a manual/offline
+step entirely, at the cost of: a new third-party dependency, doing the
+extraction on every page load (slower, especially for larger tars), and
+blob URLs that only last for the page session (can't be "seen" by simply
+opening the file system).
+
+**Recommendation:** Approach A. It matches your current manual workflow
+(you already produced `images/` folders by hand), it's simpler to debug,
+and the manifest file is a natural place to also record any collision
+renames. I'd only reach for Approach B if you want a true zero-setup
+experience where dropping in a raw `.tar` "just works" with no extra script
+run — let me know if that's actually a hard requirement.
+
+### 3.2 Rewriting image URLs using the manifest
+
+Within [jsimport.js](jsimport.js), after loading a site's XML and (if
+present) its `media-manifest.json`:
+
+1. For every post's `content` (and any `wp:attachment_url` /
+   `wp:postmeta` values worth touching), find image references, e.g.
+   `<img src="https://SITE.wordpress.com/wp-content/uploads/2023/12/wendover_woods.jpg?w=760" ...>`.
+2. Extract the basename (`wendover_woods.jpg`), ignoring the `YYYY/MM/` path
+   segment and any query string (`?w=760`).
+3. Look it up in that site's manifest:
+   - **found** → replace the `src` with the local path
+     (`site1/images/wendover_woods.jpg`), preserving the rest of the `<img>`
+     tag (alt text, classes, etc.);
+   - **not found** → leave the original hosted URL untouched, so the image
+     still loads (assuming the source site is still online) instead of
+     breaking.
+4. Disambiguation: if the manifest recorded a rename (3.1 step 3) because
+   two different original paths shared a basename, matching by basename
+   alone is ambiguous. To resolve this without over-engineering, the
+   manifest can key on the **best available discriminator** — I'd suggest
+   keying primarily by full original relative path (`2023/12/wendover_woods.jpg`)
+   with a secondary "prefer this one if only the basename is known" flag,
+   since the XML content typically embeds the full `/YYYY/MM/filename`
+   path anyway (match that first), only falling back to basename-only
+   matching for cases where the path segment truly isn't present.
+
+### 3.3 Do we need the `YYYY/MM/` structure locally? — Recommendation: no, go flat
+
+WordPress uses `wp-content/uploads/YYYY/MM/` on the *server* mainly to:
+- avoid dumping tens of thousands of files in one directory on very large,
+  long-running sites (filesystem performance / listing performance),
+- and to naturally namespace uploads over time.
+
+For a teaching-scale export (dozens of files per site, per your two current
+examples), neither concern applies. A flat `siteN/images/` folder is
+simpler to generate, simpler to reference from HTML (no need to reconstruct
+or store the month path), and is exactly what you already did by hand for
+site1/site2. The only downside is the collision case (3.1/3.2), which is
+rare at this scale and is handled by the manifest + rename step above. I'd
+keep the *manifest* aware of the original month path (for accurate
+matching) even though the *files on disk* are flattened — best of both.
+
+If you later import a much larger site where collisions become common, the
+manifest-driven approach still works — you'd just extract into
+`siteN/images/YYYY-MM/filename.jpg` instead of flattening, and the manifest
+mapping logic doesn't change, only the target path template. So this
+decision is easy to revisit later without redesigning anything.
+
+---
+
+## Suggested implementation order
+
+1. Extend the schema in [jsimport.js](jsimport.js) with `site_id` +
+   `sites` table (Part 1.2), and update the two existing pages
+   ([outdoorsinherts.html](outdoorsinherts.html),
+   [outdoors_starter.html](outdoors_starter.html)) so their existing queries
+   still work with the new columns (they only care about one site right
+   now, so this should be close to a no-op for them once the schema
+   changes are in).
+2. Implement `discoverSites()` / `discoverXmlFile()` (Part 1.3–1.4) and the
+   multi-site import loop (Part 1.5), tested against `site1` + `site2` as
+   they exist today (no manifest yet — image URLs stay as the original
+   hosted links at this stage).
+3. Write the offline extraction/manifest script (Part 3.1) and run it once
+   against `site1` and `site2` (should reproduce the `images/` folders you
+   already made by hand, plus produce `media-manifest.json` for each).
+4. Add manifest-driven URL rewriting to the importer (Part 3.2).
+5. Build [mashup.html](mashup.html) (Part 2), reusing the now-multi-site
+   [jsimport.js](jsimport.js) unchanged.
+6. Sanity check with a hypothetical `site3/` (even an empty/duplicate copy)
+   to confirm nothing in `mashup.html` or the importer needed touching.
+
+---
+
+## Clarifications I need before implementing
+
+1. **Directory discovery mechanism** — are you happy relying on the
+   Python dev server's auto-generated directory listing (Option A, zero
+   maintenance but dev-server-specific), or would you rather I build the
+   explicit `sites.json` manifest (Option C, more portable to other
+   hosting later, e.g. GitHub Pages)? I can also do "Option A with Option C
+   fallback" so it works either way — just say which you'd prefer as the
+   primary mechanism.
+2. **Tar extraction approach** — confirm Approach A (offline Python
+   script you run manually/occasionally, producing `images/` +
+   `media-manifest.json`) rather than Approach B (fully in-browser
+   untarring with no manifest). Approach A matches what you already did by
+   hand for site1/site2.
+3. **Default post ordering in `mashup.html`** — combined chronological
+   order across all sites (interleaved by date), or grouped by site (all of
+   site1's posts, then all of site2's)? I'd lean chronological by default
+   with the site filter available to narrow down, but this is your call.
+4. **What counts as "content" worth scanning for image URLs** — just
+   `content:encoded` (post body), or also `excerpt:encoded` and any
+   `wp:postmeta` values (e.g. featured image references)? The two example
+   exports mostly embed images directly in `content:encoded`, so I'd start
+   there and expand only if needed.
+5. **Non-post content** — the exports also contain `page`, `attachment`,
+   `wp_global_styles`, `wp_navigation` items etc. Current `jsimport.js`
+   already filters to `wp:post_type = post` only; should `mashup.html`
+   keep that same restriction, or do you eventually want pages included
+   too?
+6. **Folder-name gaps** — should the importer require strictly consecutive
+   `site1, site2, site3…` (sequential-probe friendly), or must it cope with
+   gaps/non-numeric suffixes? This only matters if you don't pick the
+   directory-listing discovery method (question 1), since listing parsing
+   handles gaps for free.

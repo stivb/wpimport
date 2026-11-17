@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Family Days Out in Herts</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.13.0/sql-wasm.js"></script>
+    <script src="https://stivb.github.io/wpimport/loader.js"></script>
+    <link rel="stylesheet" href="starter.css" />
+    <style>
+      .card img {
+        display: block;
+        width: 100%;
+        max-height: 200px;
+        object-fit: cover;
+        border-radius: 8px;
+        margin-bottom: 12px;
+      }
+
+      .card .badges {
+        margin-bottom: 8px;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Family Days Out in Herts</h1>
+      <div class="subtitle">Free and family-friendly things to do outdoors around Hertfordshire, plus a few local fitness options.</div>
+      <div class="status-line" id="status-line">Loading...</div>
+
+      <div class="pill-row" id="filters"></div>
+
+      <div id="content" class="grid"></div>
+    </main>
+
+    <script>
+      const state = { db: null, siteFilter: null, categoryFilter: null };
+
+      function rowsToObjects(result) {
+        if (!result || !result[0]) return [];
+        const { columns, values } = result[0];
+        return values.map((row) => {
+          const obj = {};
+          columns.forEach((col, idx) => { obj[col] = row[idx]; });
+          return obj;
+        });
+      }
+
+      // Pulls the first <img src="..."> out of a post's raw content, if any,
+      // so cards get a photo without needing to render the full WordPress markup.
+      function firstImageSrc(html) {
+        if (!html) return null;
+        const match = html.match(/<img\b[^>]*\bsrc="([^"]+)"/i);
+        return match ? match[1] : null;
+      }
+
+      function buildQuery() {
+        const clauses = ['p.isPublic = 1'];
+        const params = [];
+        if (state.siteFilter) {
+          clauses.push('p.site_id = ?');
+          params.push(state.siteFilter);
+        }
+        if (state.categoryFilter) {
+          clauses.push(`p.id IN (
+            SELECT pt.post_id FROM post_terms pt
+            JOIN terms t ON t.term_id = pt.term_id AND t.site_id = pt.site_id AND t.kind = pt.kind
+            WHERE pt.site_id = p.site_id AND t.name = ?
+          )`);
+          params.push(state.categoryFilter);
+        }
+        const sql = `
+          SELECT p.site_id, p.id, p.title, p.date, p.excerpt, p.content, p.link, s.title AS site_title
+          FROM posts p
+          JOIN sites s ON s.site_id = p.site_id
+          WHERE ${clauses.join(' AND ')}
+          ORDER BY p.date DESC
+        `;
+        return { sql, params };
+      }
+
+      function renderFilters(sites, categories) {
+        const filtersEl = document.getElementById('filters');
+        const siteButtons = sites.map((site) => {
+          const active = state.siteFilter === site.site_id ? 'active' : '';
+          return `<span class="pill site ${active}" data-kind="site" data-value="${Loader.escapeHtml(site.site_id)}">${Loader.escapeHtml(site.title)}</span>`;
+        });
+        const allSitesActive = state.siteFilter === null ? 'active' : '';
+        const categoryButtons = categories.map((cat) => {
+          const active = state.categoryFilter === cat.name ? 'active' : '';
+          return `<span class="pill ${active}" data-kind="category" data-value="${Loader.escapeHtml(cat.name)}">${Loader.escapeHtml(cat.name)} (${cat.count})</span>`;
+        });
+        const allCategoriesActive = state.categoryFilter === null ? 'active' : '';
+
+        filtersEl.innerHTML = `
+          <span class="pill site ${allSitesActive}" data-kind="site" data-value="">All sites</span>
+          ${siteButtons.join('')}
+          <span class="pill ${allCategoriesActive}" data-kind="category" data-value="">All categories</span>
+          ${categoryButtons.join('')}
+        `;
+
+        filtersEl.querySelectorAll('.pill').forEach((el) => {
+          el.addEventListener('click', () => {
+            const kind = el.dataset.kind;
+            const value = el.dataset.value || null;
+            if (kind === 'site') state.siteFilter = value;
+            if (kind === 'category') state.categoryFilter = value;
+            renderFilters(sites, categories);
+            renderPosts();
+          });
+        });
+      }
+
+      function renderPosts() {
+        const contentEl = document.getElementById('content');
+        const { sql, params } = buildQuery();
+        const rows = rowsToObjects(state.db.exec(sql, params));
+
+        if (!rows.length) {
+          contentEl.innerHTML = '<p>No posts match this filter.</p>';
+          return;
+        }
+
+        contentEl.innerHTML = rows.map((row) => {
+          const image = firstImageSrc(row.content);
+          const description = row.excerpt && row.excerpt.trim()
+            ? row.excerpt
+            : (row.content || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 160);
+
+          return `
+            <article class="card">
+              ${image ? `<img src="${Loader.escapeHtml(image)}" alt="" loading="lazy" />` : ''}
+              <div class="badges"><span class="pill site">${Loader.escapeHtml(row.site_title)}</span></div>
+              <h2>${Loader.escapeHtml(row.title || '(untitled)')}</h2>
+              <div class="meta">${Loader.escapeHtml(Loader.formatDate(row.date))}</div>
+              <p>${Loader.escapeHtml(description)}</p>
+            </article>
+          `;
+        }).join('');
+      }
+
+      async function startApp() {
+        const statusEl = document.getElementById('status-line');
+        try {
+          const { db, curation } = await Loader.initializeDatabase();
+          state.db = db;
+
+          if (curation.error) {
+            statusEl.textContent = `Loaded, but curation.sql failed to run: ${curation.error}`;
+            statusEl.classList.add('error');
+          } else {
+            statusEl.textContent = curation.applied
+              ? 'Loaded site-cache.json and applied curation.sql.'
+              : 'Loaded site-cache.json (no curation.sql applied).';
+          }
+
+          const sites = rowsToObjects(db.exec('SELECT site_id, title FROM sites ORDER BY site_order'));
+          const categories = rowsToObjects(db.exec(`
+            SELECT t.name AS name, COUNT(DISTINCT pt.site_id || ':' || pt.post_id) AS count
+            FROM terms t
+            JOIN post_terms pt ON pt.term_id = t.term_id AND pt.site_id = t.site_id AND pt.kind = t.kind
+            JOIN posts p ON p.id = pt.post_id AND p.site_id = pt.site_id
+            WHERE t.kind = 'category' AND p.isPublic = 1
+            GROUP BY t.name
+            ORDER BY count DESC, t.name
+          `));
+
+          renderFilters(sites, categories);
+          renderPosts();
+        } catch (error) {
+          statusEl.textContent = `Failed to load data: ${error.message}`;
+          statusEl.classList.add('error');
+        }
+      }
+
+      startApp();
+    </script>
+  </body>
+</html>
