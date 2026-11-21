@@ -303,9 +303,13 @@
           title: 'Tags used by site',
           sql: "SELECT DISTINCT s.site_id, s.title AS site, t.name AS tag\nFROM terms t\nJOIN post_terms pt ON pt.site_id = t.site_id AND pt.term_id = t.term_id AND pt.kind = t.kind\nJOIN posts p ON p.site_id = pt.site_id AND p.id = pt.post_id\nJOIN sites s ON s.site_id = t.site_id\nWHERE t.kind = 'tag'\nORDER BY s.site_order, t.name;",
         },
+        {
+          title: 'List all tables',
+          sql: "SELECT tables.name AS table_name, fields.name AS field_name\nFROM sqlite_master AS tables, pragma_table_info(tables.name) AS fields\nWHERE tables.type = 'table'\nORDER BY tables.name, fields.cid;",
+        },
       ];
 
-      const ADDED_QUERIES = DEFAULT_QUERIES.slice(-4);
+      const ADDED_QUERIES = DEFAULT_QUERIES.slice(-5);
 
       const state = {
         db: null,

@@ -32,4 +32,5 @@ See `curation.sql` for exactly how each of these is hidden.
 - Filter by site → narrow to one source blog.
 - Filter by category → narrow to a specific activity type (Parks, Walking,
   Wildlife, gym, outdoors).
+  -make the cards clickable to open the original post in a new tab.
 

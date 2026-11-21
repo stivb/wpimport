@@ -1,0 +1,368 @@
+<h1
+id="lab-practical-1-web-page-editing-and-ai-assisted-documentation">Lab
+Practical 1: Web Page Editing and AI-Assisted Documentation</h1>
+<h2 id="overview">Overview</h2>
+<p>In this practical, you’ll make simple but meaningful edits to
+<code>site.html</code> and <code>site.css</code>, then document your
+changes in <code>site.md</code>. You’ll learn how <strong>context
+matters for AI</strong> — specifically, why <code>site.md</code> is
+essential reading before anyone (human or AI) makes changes.</p>
+<hr />
+<h2 id="part-a-understanding-the-context">Part A: Understanding the
+Context</h2>
+<h3 id="why-site.md-is-critical">Why site.md is Critical</h3>
+<p>Before making <strong>any</strong> change to this site, read <a
+href="./site.md">site.md</a> completely. Here’s why:</p>
+<ol type="1">
+<li><p><strong>It explains the design philosophy</strong>: The site
+separates concerns into HTML (structure), CSS (appearance), JavaScript
+(interaction), and SQL (data selection).</p></li>
+<li><p><strong>It documents assumptions</strong>: The page assumes
+certain data tables, fields, and WordPress conventions. Changes that
+break these assumptions break the page.</p></li>
+<li><p><strong>It describes the flow</strong>: Understanding how the
+page loads, queries, and renders helps you predict side effects of your
+edits.</p></li>
+<li><p><strong>It guides AI assistants</strong>: When you ask Copilot or
+another AI to help, pasting or referencing site.md ensures the AI
+understands your project’s constraints and style before suggesting
+changes.</p></li>
+<li><p><strong>It prevents rework</strong>: Many frustrated hours come
+from changing code without understanding its purpose. Good documentation
+saves time.</p></li>
+</ol>
+<p><strong>Rule 1:</strong> Always share <code>site.md</code> context
+with AI before asking it to edit site.html or related files.</p>
+<hr />
+<h2 id="part-b-your-tasks">Part B: Your Tasks</h2>
+<h3 id="setup">Setup</h3>
+<ol type="1">
+<li>If you haven’t already, clone or fork the repository to your local
+machine.</li>
+<li>Navigate to the <code>A2_Sites</code> directory.</li>
+<li>Verify you have <code>site.html</code>, <code>site.md</code>, and
+<code>starter.css</code>.</li>
+<li>Ensure git is initialized and you can commit and push changes.</li>
+</ol>
+<h3 id="task-1-change-the-page-title">Task 1: Change the Page Title</h3>
+<p><strong>Goal:</strong> Update the main heading and browser tab title
+to something new.</p>
+<p><strong>What to do:</strong></p>
+<ol type="1">
+<li>Open <code>site.html</code> in your editor.</li>
+<li>Find the <code>&lt;title&gt;</code> tag in the
+<code>&lt;head&gt;</code> section. It currently says
+<code>Days Out in Herts</code>.</li>
+<li>Change it to a new title of your choice (e.g.,
+<code>My Awesome Activities</code> or
+<code>Local Events Hub</code>).</li>
+<li>Find the main <code>&lt;h1&gt;</code> heading in the
+<code>&lt;body&gt;</code>. It also says
+<code>Days Out in Herts</code>.</li>
+<li>Change it to match your new title.</li>
+</ol>
+<p><strong>Commit:</strong></p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> add site.html</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> commit <span class="at">-m</span> <span class="st">&quot;Update page title to &#39;My Awesome Activities&#39;&quot;</span></span></code></pre></div>
+<p>Then push: <code>git push origin main</code> (or your branch
+name).</p>
+<p><strong>Update site.md:</strong></p>
+<ol type="1">
+<li><p>Ask Copilot: <em>“I changed the page title in site.html from
+‘Days Out in Herts’ to ‘My Awesome Activities’. Please add an entry to
+site.md documenting this change under a new ‘Change Log’ section.
+Include the date, what was changed, and why (you can reason about why a
+user might want to personalize the title).”</em></p></li>
+<li><p>Review Copilot’s suggestion, then apply it to site.md.</p></li>
+<li><p>Commit:
+<code>git add site.md &amp;&amp; git commit -m "Document title change in site.md"</code></p></li>
+</ol>
+<hr />
+<h3 id="task-2-change-the-font-used-in-site.html">Task 2: Change the
+Font Used in site.html</h3>
+<p><strong>Goal:</strong> Modify the CSS to use a different font family
+for the entire page.</p>
+<p><strong>What to do:</strong></p>
+<ol type="1">
+<li>Open <code>starter.css</code> in your editor.</li>
+<li>Look for the <code>body</code> or <code>main</code> selector. It
+likely has a <code>font-family</code> property.</li>
+<li>Change the font to something different. Options:
+<ul>
+<li><code>"Courier New", monospace</code> (a fixed-width font)</li>
+<li><code>"Georgia", serif</code> (a serif font)</li>
+<li><code>"Trebuchet MS", sans-serif</code> (a clean sans-serif)</li>
+<li>Any Google Font you like (you’d need to add a <code>@import</code>
+rule at the top of the CSS)</li>
+</ul></li>
+<li>Save and test: open <code>site.html</code> in a browser and verify
+the font looks right.</li>
+</ol>
+<p><strong>Commit:</strong></p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> add starter.css</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> commit <span class="at">-m</span> <span class="st">&quot;Change page font to Georgia serif&quot;</span></span></code></pre></div>
+<p>Push: <code>git push origin main</code></p>
+<p><strong>Update site.md:</strong></p>
+<p>Ask Copilot: <em>“I changed the font in starter.css. Please add this
+change to the Change Log section in site.md. Explain that CSS controls
+appearance, as described in the site’s design philosophy, and note which
+file was changed and what the new font is.”</em></p>
+<p>Apply and commit as before.</p>
+<hr />
+<h3 id="task-3-change-the-background-color-of-site.html">Task 3: Change
+the Background Color of site.html</h3>
+<p><strong>Goal:</strong> Modify the CSS to give the page a different
+background color.</p>
+<p><strong>What to do:</strong></p>
+<ol type="1">
+<li>Open <code>starter.css</code>.</li>
+<li>Find the <code>body</code> selector or the main content area (look
+for <code>main</code>).</li>
+<li>Add or modify a <code>background-color</code> property. Try
+something like:
+<ul>
+<li><code>background-color: #f0f8ff;</code> (Alice blue)</li>
+<li><code>background-color: #fffacd;</code> (Light yellow)</li>
+<li><code>background-color: #e0f0d8;</code> (Light green)</li>
+</ul></li>
+<li>Save and test in your browser.</li>
+</ol>
+<p><strong>Commit:</strong></p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> add starter.css</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> commit <span class="at">-m</span> <span class="st">&quot;Add light blue background color to page&quot;</span></span></code></pre></div>
+<p>Push.</p>
+<p><strong>Update site.md:</strong></p>
+<p>Ask Copilot: <em>“I added a background color to the page. Please add
+this to the Change Log in site.md. This is a CSS-only change and does
+not affect the data structure or JavaScript interaction. Note that
+background color is a pure styling choice.”</em></p>
+<p>Apply and commit.</p>
+<hr />
+<h3 id="task-4-exclude-an-arbitrary-source-site-from-the-page">Task 4:
+Exclude an Arbitrary Source Site from the Page</h3>
+<p><strong>Goal:</strong> Use the curation system to hide posts from one
+site (e.g., <code>site1</code>).</p>
+<p><strong>What to do:</strong></p>
+<ol type="1">
+<li><p>Open <code>curation.sql</code> (if it exists) or examine the
+site.html script for the <code>curation.sql</code> loading behavior.
+Look at site.md under “What curation changes.”</p></li>
+<li><p>If <code>curation.sql</code> exists, add a line to mark all posts
+from one site as not public:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode sql"><code class="sourceCode sql"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">UPDATE</span> posts <span class="kw">SET</span> isPublic <span class="op">=</span> <span class="dv">0</span> <span class="kw">WHERE</span> site_id <span class="op">=</span> <span class="st">&#39;site1&#39;</span>;</span></code></pre></div></li>
+<li><p>Save and test: open site.html in your browser. Posts from
+<code>site1</code> should no longer appear, but the filter buttons
+should still show (with 0 posts for that site).</p></li>
+<li><p>Alternatively, if curation isn’t yet set up, modify
+<code>site.html</code>’s <code>buildQuery()</code> function to add a
+condition like:</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode js"><code class="sourceCode javascript"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>clauses<span class="op">.</span><span class="fu">push</span>(<span class="st">&#39;p.site_id != ?&#39;</span>)<span class="op">;</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>params<span class="op">.</span><span class="fu">push</span>(<span class="st">&#39;site1&#39;</span>)<span class="op">;</span></span></code></pre></div></li>
+</ol>
+<p><strong>Commit:</strong></p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> add curation.sql  <span class="co"># or site.html if you edited JavaScript</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> commit <span class="at">-m</span> <span class="st">&quot;Exclude site1 posts from the displayed feed via curation&quot;</span></span></code></pre></div>
+<p>Push.</p>
+<p><strong>Update site.md:</strong></p>
+<p>Ask Copilot: <em>“I’ve excluded posts from ‘site1’ from the feed.
+Please add this to the Change Log in site.md. Explain where the
+exclusion happens (curation layer or JavaScript filter) and note that
+this is an editorial decision that affects what content is shown but
+does not change the underlying data structure.”</em></p>
+<p>Apply and commit.</p>
+<hr />
+<h3
+id="task-5-make-links-from-the-card-to-the-original-wordpress-post">Task
+5: Make Links from the Card to the Original WordPress Post</h3>
+<p><strong>Goal:</strong> Turn the post card into a clickable link that
+opens the original post in a new tab or window.</p>
+<p><strong>What to do:</strong></p>
+<ol type="1">
+<li><p>Open <code>site.html</code>.</p></li>
+<li><p>Find the <code>renderPosts()</code> function (search for
+“function renderPosts”).</p></li>
+<li><p>Look at the line where the card <code>&lt;article&gt;</code> is
+created. The post data includes a <code>link</code> property pointing to
+the original WordPress URL.</p></li>
+<li><p>Wrap the card content in an <code>&lt;a&gt;</code> tag, or add an
+explicit “Read more” link:</p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode html"><code class="sourceCode html"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">a</span><span class="ot"> href</span><span class="op">=</span><span class="st">&quot;${Loader.escapeHtml(post.link)}&quot;</span><span class="ot"> target</span><span class="op">=</span><span class="st">&quot;_blank&quot;</span><span class="ot"> rel</span><span class="op">=</span><span class="st">&quot;noopener noreferrer&quot;</span><span class="dt">&gt;</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="co">&lt;!-- card content here --&gt;</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">a</span><span class="dt">&gt;</span></span></code></pre></div>
+<p>OR add this near the bottom of the card:</p>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode html"><code class="sourceCode html"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">a</span><span class="ot"> href</span><span class="op">=</span><span class="st">&quot;${Loader.escapeHtml(post.link)}&quot;</span><span class="ot"> target</span><span class="op">=</span><span class="st">&quot;_blank&quot;</span><span class="ot"> rel</span><span class="op">=</span><span class="st">&quot;noopener noreferrer&quot;</span><span class="dt">&gt;</span>Read full post on ${Loader.escapeHtml(post.site_title)}<span class="dt">&lt;/</span><span class="kw">a</span><span class="dt">&gt;</span></span></code></pre></div></li>
+<li><p>Save, test in your browser. Click a card or the “Read full post”
+link; it should open the original post.</p></li>
+</ol>
+<p><strong>Commit:</strong></p>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> add site.html</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> commit <span class="at">-m</span> <span class="st">&quot;Add clickable link from post card to original WordPress post&quot;</span></span></code></pre></div>
+<p>Push.</p>
+<p><strong>Update site.md:</strong></p>
+<p>Ask Copilot: <em>“I modified site.html to make post cards link to the
+original WordPress posts. Please add this to the Change Log in site.md.
+Explain that the <code>link</code> field was already in the query
+result, and that adding the link improves usability by letting visitors
+read the full post without losing context. Note that this is a
+JavaScript rendering change.”</em></p>
+<p>Apply and commit.</p>
+<hr />
+<h3 id="task-6-add-a-return-to-page-link-on-the-status-line">Task 6: Add
+a “Return to Page” Link on the Status Line</h3>
+<p><strong>Goal:</strong> Add a simple link or indicator to the status
+message so visitors can understand the page’s purpose at a glance.</p>
+<p><strong>What to do:</strong></p>
+<ol type="1">
+<li><p>Open <code>site.html</code>.</p></li>
+<li><p>Find the
+<code>&lt;div class="status-line" id="status-line"&gt;Loading...&lt;/div&gt;</code>
+in the HTML body.</p></li>
+<li><p>When the page finishes loading, its JavaScript updates this
+status to show a message like “Showing X posts” or “Curation
+applied.”</p></li>
+<li><p>Add a small info text or icon that appears in the status line.
+For example:</p>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode html"><code class="sourceCode html"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">div</span><span class="ot"> class</span><span class="op">=</span><span class="st">&quot;status-line&quot;</span><span class="ot"> id</span><span class="op">=</span><span class="st">&quot;status-line&quot;</span><span class="dt">&gt;</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&lt;</span><span class="kw">span</span><span class="dt">&gt;</span>Loading...<span class="dt">&lt;/</span><span class="kw">span</span><span class="dt">&gt;</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&lt;</span><span class="kw">a</span><span class="ot"> href</span><span class="op">=</span><span class="st">&quot;#&quot;</span><span class="ot"> title</span><span class="op">=</span><span class="st">&quot;Learn how this page works&quot;</span><span class="dt">&gt;</span>ℹ️<span class="dt">&lt;/</span><span class="kw">a</span><span class="dt">&gt;</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">div</span><span class="dt">&gt;</span></span></code></pre></div></li>
+<li><p>Or, modify the JavaScript that sets the status line text to
+append helpful information:</p>
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode js"><code class="sourceCode javascript"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>statusLineEl<span class="op">.</span><span class="at">textContent</span> <span class="op">=</span> <span class="vs">`Showing </span><span class="sc">${</span>postCount<span class="sc">}</span><span class="vs"> posts from </span><span class="sc">${</span>siteCount<span class="sc">}</span><span class="vs"> source(s). `</span><span class="op">;</span></span></code></pre></div></li>
+</ol>
+<p><strong>Commit:</strong></p>
+<div class="sourceCode" id="cb12"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> add site.html</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> commit <span class="at">-m</span> <span class="st">&quot;Add informational status text to help visitors understand the page&quot;</span></span></code></pre></div>
+<p>Push.</p>
+<p><strong>Update site.md:</strong></p>
+<p>Ask Copilot: <em>“I enhanced the status line to show more information
+about the page’s content and purpose. Please add this to the Change Log
+in site.md. This is a JavaScript and HTML change that improves the
+visitor experience without changing the data model.”</em></p>
+<p>Apply and commit.</p>
+<hr />
+<h3 id="task-7-change-the-subtitle-or-description">Task 7: Change the
+Subtitle or Description</h3>
+<p><strong>Goal:</strong> Update the page’s explanatory text to reflect
+your site’s purpose.</p>
+<p><strong>What to do:</strong></p>
+<ol type="1">
+<li>Open <code>site.html</code>.</li>
+<li>Find the <code>&lt;div class="subtitle"&gt;</code> element. It
+currently says <em>“Free and family-friendly things to do outdoors
+around Hertfordshire, plus a few local fitness options.”</em></li>
+<li>Change it to describe your version of the site (e.g., <em>“Your
+guide to amazing events and activities in your area”</em> or
+<em>“Curated local recommendations, all in one place”</em>).</li>
+<li>Save and test.</li>
+</ol>
+<p><strong>Commit:</strong></p>
+<div class="sourceCode" id="cb13"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> add site.html</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> commit <span class="at">-m</span> <span class="st">&quot;Update subtitle to describe the site&#39;s purpose&quot;</span></span></code></pre></div>
+<p>Push.</p>
+<p><strong>Update site.md:</strong></p>
+<p>Ask Copilot: <em>“I updated the site’s subtitle to better reflect its
+purpose. Please add this to the Change Log in site.md. Explain that the
+subtitle is part of the HTML structure and communicates the site’s value
+to visitors.”</em></p>
+<p>Apply and commit.</p>
+<hr />
+<h2 id="part-c-reviewing-your-work">Part C: Reviewing Your Work</h2>
+<h3 id="checklist">Checklist</h3>
+<p>After completing the tasks, verify:</p>
+<ul class="task-list">
+<li><label><input type="checkbox" />You made at least 7 commits (one per
+task, plus one for each site.md update).</label></li>
+<li><label><input type="checkbox" />Each commit has a clear, descriptive
+message.</label></li>
+<li><label><input type="checkbox" />All commits have been pushed to
+GitHub.</label></li>
+<li><label><input type="checkbox" />site.md now has a “Change Log”
+section documenting every change.</label></li>
+<li><label><input type="checkbox" />site.html still loads and displays
+correctly in your browser.</label></li>
+<li><label><input type="checkbox" />The original data and functionality
+are intact (you only changed presentation or non-critical
+behavior).</label></li>
+</ul>
+<h3 id="reflection-questions">Reflection Questions</h3>
+<p>Answer these in a short text file or as comments in your
+repository:</p>
+<ol type="1">
+<li><p><strong>Context and AI:</strong> Why is it important to share
+<code>site.md</code> with an AI assistant before asking it to modify
+<code>site.html</code>? What information did <code>site.md</code>
+provide that helped you understand the page?</p></li>
+<li><p><strong>Separation of Concerns:</strong> How did the site’s
+separation of HTML, CSS, JavaScript, and SQL help you make changes
+without breaking the page? Can you think of a change that <em>would</em>
+break the page?</p></li>
+<li><p><strong>Documentation:</strong> How did updating
+<code>site.md</code> after each change help you (and might help others)
+understand what was modified and why?</p></li>
+<li><p><strong>Git Workflow:</strong> What did each commit message tell
+you about the change? Could someone else understand what you did just by
+reading your commit log?</p></li>
+</ol>
+<hr />
+<h2 id="part-d-optional-challenges">Part D: Optional Challenges</h2>
+<p>If you’ve completed all tasks and have time, try one of these:</p>
+<h3 id="challenge-a-add-a-custom-color-theme-toggle">Challenge A: Add a
+Custom Color Theme Toggle</h3>
+<p>Add a button or dropdown that lets visitors switch between light and
+dark themes. Store the choice in <code>localStorage</code> so it
+persists.</p>
+<p><strong>Hint:</strong> Modify <code>starter.css</code> to include a
+<code>:root</code> CSS variable like <code>--bg-color: white;</code>,
+then toggle its value with JavaScript.</p>
+<h3 id="challenge-b-display-only-recent-posts">Challenge B: Display Only
+Recent Posts</h3>
+<p>Add a filter to show only posts from the last 7, 14, or 30 days.
+Modify <code>buildQuery()</code> to add a date condition.</p>
+<p><strong>Hint:</strong> JavaScript dates can be compared; SQL
+<code>date()</code> functions can help too.</p>
+<h3 id="challenge-c-search-by-title">Challenge C: Search by Title</h3>
+<p>Add a text input box that filters posts by title keyword. This is
+similar to the category filter but searches text instead of exact
+matches.</p>
+<p><strong>Hint:</strong> Use SQL <code>LIKE</code> operator:
+<code>WHERE p.title LIKE ?</code> with parameter
+<code>'%' + searchTerm + '%'</code>.</p>
+<h3 id="challenge-d-show-a-post-count-by-site">Challenge D: Show a Post
+Count by Site</h3>
+<p>Add a badge to each site filter button showing how many posts are
+from that site. The current code already has the info; you just need to
+query and display it.</p>
+<hr />
+<h2 id="submission">Submission</h2>
+<p>Commit and push all your changes. Submit the URL of your GitHub
+repository to your instructor.</p>
+<p>Include: - All 7 (or more) completed tasks. - Updated
+<code>site.md</code> with a Change Log. - Answers to the Reflection
+Questions. - (Optional) Evidence of Challenge attempts.</p>
+<hr />
+<h2 id="summary">Summary</h2>
+<p>By completing this practical, you have:</p>
+<p>✅ Learned why documentation is essential before making
+changes.<br />
+✅ Practiced using version control to track your edits.<br />
+✅ Collaborated with an AI assistant to keep your documentation up to
+date.<br />
+✅ Separated presentation (CSS, HTML) from behavior (JavaScript) and
+data (SQL).<br />
+✅ Made meaningful, observable changes to a real web page.</p>
+<p>Great work! You now understand how small, well-documented changes
+build a maintainable project.</p>

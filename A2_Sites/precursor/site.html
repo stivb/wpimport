@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Days Out in Herts</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.13.0/sql-wasm.js"></script>
+    <script src="https://stivb.github.io/wpimport/A2_Sites/loader.js?v=b7319f3"></script>
+    <link rel="stylesheet" href="starter.css" />
+    <style>
+      .card img {
+        display: block;
+        width: 100%;
+        max-height: 200px;
+        object-fit: cover;
+        border-radius: 8px;
+        margin-bottom: 12px;
+      }
+
+      .card .badges {
+        margin-bottom: 8px;
+      }
+
+      .filters {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+        gap: 12px;
+        margin-bottom: 22px;
+      }
+
+      .filter-group {
+        display: grid;
+        gap: 5px;
+      }
+
+      .filter-label {
+        color: var(--muted);
+        font-size: 0.9rem;
+        font-weight: bold;
+      }
+
+      .filter-select {
+        width: 100%;
+        padding: 8px 10px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        background: var(--panel);
+        color: var(--text);
+        font: inherit;
+      }
+
+      .filter-select:focus-visible {
+        outline: 3px solid var(--blue);
+        outline-offset: 2px;
+      }
+
+      a.card-link {
+        display: block;
+        color: inherit;
+        text-decoration: none;
+      }
+
+      a.card-link:hover {
+        border-color: var(--green);
+      }
+
+      a.card-link:focus-visible {
+        outline: 3px solid var(--blue);
+        outline-offset: 3px;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Days Out in Herts</h1>
+      <div class="subtitle">Find affordable parks, walks, wildlife, fitness and wellbeing around Hertfordshire.</div>
+      <div class="status-line" id="status-line">Loading...</div>
+
+      <div class="filters" id="filters"></div>
+
+      <div id="content" class="grid"></div>
+    </main>
+
+    <script>
+      const state = { db: null, siteFilter: null, categoryFilter: null, tagFilter: null };
+
+      function rowsToObjects(result) {
+        if (!result || !result[0]) return [];
+        const { columns, values } = result[0];
+        return values.map((row) => {
+          const obj = {};
+          columns.forEach((col, idx) => { obj[col] = row[idx]; });
+          return obj;
+        });
+      }
+
+      // Pulls the first <img src="..."> out of a post's raw content, if any,
+      // so cards get a photo without needing to render the full WordPress markup.
+      function firstImageSrc(html) {
+        if (!html) return null;
+        const match = html.match(/<img\b[^>]*\bsrc="([^"]+)"/i);
+        return match ? match[1] : null;
+      }
+
+      function buildQuery() {
+        const clauses = ['p.isPublic = 1'];
+        const params = [];
+        if (state.siteFilter) {
+          clauses.push('p.site_id = ?');
+          params.push(state.siteFilter);
+        }
+        [
+          ['category', state.categoryFilter],
+          ['tag', state.tagFilter],
+        ].forEach(([kind, name]) => {
+          if (!name) return;
+          clauses.push(`EXISTS (
+            SELECT 1 FROM post_terms pt
+            JOIN terms t ON t.term_id = pt.term_id AND t.site_id = pt.site_id AND t.kind = pt.kind
+            WHERE pt.site_id = p.site_id AND pt.post_id = p.id
+              AND t.kind = ? AND t.name = ?
+          )`);
+          params.push(kind, name);
+        });
+        const sql = `
+          SELECT p.site_id, p.id, p.title, p.date, p.excerpt, p.content, p.link, s.title AS site_title
+          FROM posts p
+          JOIN sites s ON s.site_id = p.site_id
+          WHERE ${clauses.join(' AND ')}
+          ORDER BY p.date DESC
+        `;
+        return { sql, params };
+      }
+
+      function renderFilters(sites, categories, tags) {
+        const filtersEl = document.getElementById('filters');
+        filtersEl.innerHTML = `
+          <label class="filter-group">
+            <span class="filter-label">Source site</span>
+            <select class="filter-select" data-kind="site">
+              <option value="">All sites</option>
+              ${sites.map((site) => `<option value="${Loader.escapeHtml(site.site_id)}" ${state.siteFilter === site.site_id ? 'selected' : ''}>${Loader.escapeHtml(site.title)}</option>`).join('')}
+            </select>
+          </label>
+          <label class="filter-group">
+            <span class="filter-label">Category</span>
+            <select class="filter-select" data-kind="category">
+              <option value="">All categories</option>
+              ${categories.map((category) => `<option value="${Loader.escapeHtml(category.name)}" ${state.categoryFilter === category.name ? 'selected' : ''}>${Loader.escapeHtml(category.name)} (${category.count})</option>`).join('')}
+            </select>
+          </label>
+          <label class="filter-group">
+            <span class="filter-label">Tag</span>
+            <select class="filter-select" data-kind="tag">
+              <option value="">All tags</option>
+              ${tags.map((tag) => `<option value="${Loader.escapeHtml(tag.name)}" ${state.tagFilter === tag.name ? 'selected' : ''}>${Loader.escapeHtml(tag.name)} (${tag.count})</option>`).join('')}
+            </select>
+          </label>
+        `;
+
+        filtersEl.querySelectorAll('select').forEach((el) => {
+          el.addEventListener('change', () => {
+            const kind = el.dataset.kind;
+            const value = el.value || null;
+            if (kind === 'site') state.siteFilter = value;
+            if (kind === 'category') state.categoryFilter = value;
+            if (kind === 'tag') state.tagFilter = value;
+            renderPosts();
+          });
+        });
+      }
+
+      function getTaxonomyTerms(db, kind) {
+        return rowsToObjects(db.exec(`
+          SELECT t.name AS name, COUNT(DISTINCT pt.site_id || ':' || pt.post_id) AS count
+          FROM terms t
+          JOIN post_terms pt ON pt.term_id = t.term_id AND pt.site_id = t.site_id AND pt.kind = t.kind
+          JOIN posts p ON p.id = pt.post_id AND p.site_id = pt.site_id
+          WHERE t.kind = ? AND p.isPublic = 1
+          GROUP BY t.name
+          ORDER BY count DESC, t.name
+        `, [kind]));
+      }
+
+      function renderPosts() {
+        const contentEl = document.getElementById('content');
+        const { sql, params } = buildQuery();
+        const rows = rowsToObjects(state.db.exec(sql, params));
+
+        if (!rows.length) {
+          contentEl.innerHTML = '<p>No posts match this filter.</p>';
+          return;
+        }
+
+        contentEl.innerHTML = rows.map((row) => {
+          const image = firstImageSrc(row.content);
+          const title = Loader.escapeHtml(row.title || '(untitled)');
+          const description = row.excerpt && row.excerpt.trim()
+            ? row.excerpt
+            : (row.content || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 160);
+          const postUrl = /^https?:\/\//i.test(row.link || '') ? row.link : null;
+          const cardTag = postUrl ? 'a' : 'article';
+          const cardClass = postUrl ? 'card card-link' : 'card';
+          const linkAttributes = postUrl
+            ? `href="${Loader.escapeHtml(postUrl)}" target="_blank" rel="noopener noreferrer" aria-label="Open ${title} in a new tab"`
+            : '';
+
+          return `
+            <${cardTag} class="${cardClass}" ${linkAttributes}>
+              ${image ? `<img src="${Loader.escapeHtml(image)}" alt="" loading="lazy" />` : ''}
+              <div class="badges"><span class="pill site">${Loader.escapeHtml(row.site_title)}</span></div>
+              <h2>${title}</h2>
+              <div class="meta">${Loader.escapeHtml(Loader.formatDate(row.date))}</div>
+              <p>${Loader.escapeHtml(description)}</p>
+              ${postUrl ? '' : '<div class="meta">Original link unavailable</div>'}
+            </${cardTag}>
+          `;
+        }).join('');
+      }
+
+      async function startApp() {
+        const statusEl = document.getElementById('status-line');
+        try {
+          const { db, curation } = await Loader.initializeDatabase();
+          state.db = db;
+
+          if (curation.error) {
+            statusEl.textContent = `Loaded, but curation.sql failed to run: ${curation.error}`;
+            statusEl.classList.add('error');
+          } else {
+            statusEl.textContent = curation.applied
+              ? 'Loaded site-cache.json and applied curation.sql.'
+              : 'Loaded site-cache.json (no curation.sql applied).';
+          }
+
+          const sites = rowsToObjects(db.exec('SELECT site_id, title FROM sites ORDER BY site_order'));
+          const categories = getTaxonomyTerms(db, 'category');
+          const tags = getTaxonomyTerms(db, 'tag');
+
+          renderFilters(sites, categories, tags);
+          renderPosts();
+        } catch (error) {
+          statusEl.textContent = `Failed to load data: ${error.message}`;
+          statusEl.classList.add('error');
+        }
+      }
+
+      startApp();
+    </script>
+  </body>
+</html>
