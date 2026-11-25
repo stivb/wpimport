@@ -20,6 +20,49 @@
       .card .badges {
         margin-bottom: 8px;
       }
+
+      .term-menus {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 14px;
+      }
+
+      .term-menu {
+        position: relative;
+      }
+
+      .term-menu summary {
+        cursor: pointer;
+      }
+
+      .term-menu-list {
+        position: absolute;
+        z-index: 1;
+        min-width: 220px;
+        max-height: 50vh;
+        overflow-y: auto;
+        background: white;
+        border: 1px solid #dfe7d7;
+        border-radius: 8px;
+        padding: 6px;
+      }
+
+      .term-menu-list button {
+        display: block;
+        width: 100%;
+        border: 0;
+        background: transparent;
+        padding: 8px;
+        text-align: left;
+        cursor: pointer;
+      }
+
+      .term-menu-list button:hover,
+      .term-menu-list button:focus,
+      .term-menu-list button[aria-pressed="true"] {
+        background: #eaf5ee;
+      }
     </style>
   </head>
   <body>
@@ -29,12 +72,13 @@
       <div class="status-line" id="status-line">Loading...</div>
 
       <div class="pill-row" id="filters"></div>
+      <nav class="term-menus" id="term-menus" aria-label="Browse topics"></nav>
 
       <div id="content" class="grid"></div>
     </main>
 
     <script>
-      const state = { db: null, siteFilter: null, categoryFilter: null };
+      const state = { db: null, siteFilter: null, termFilter: null };
 
       function rowsToObjects(result) {
         if (!result || !result[0]) return [];
@@ -61,13 +105,13 @@
           clauses.push('p.site_id = ?');
           params.push(state.siteFilter);
         }
-        if (state.categoryFilter) {
+        if (state.termFilter) {
           clauses.push(`p.id IN (
             SELECT pt.post_id FROM post_terms pt
             JOIN terms t ON t.term_id = pt.term_id AND t.site_id = pt.site_id AND t.kind = pt.kind
-            WHERE pt.site_id = p.site_id AND t.name = ?
+            WHERE pt.site_id = p.site_id AND LOWER(t.name) = LOWER(?)
           )`);
-          params.push(state.categoryFilter);
+          params.push(state.termFilter);
         }
         const sql = `
           SELECT p.site_id, p.id, p.title, p.date, p.excerpt, p.content, p.link, s.title AS site_title
@@ -79,33 +123,53 @@
         return { sql, params };
       }
 
-      function renderFilters(sites, categories) {
+      function renderFilters(sites, terms) {
         const filtersEl = document.getElementById('filters');
         const siteButtons = sites.map((site) => {
           const active = state.siteFilter === site.site_id ? 'active' : '';
-          return `<span class="pill site ${active}" data-kind="site" data-value="${Loader.escapeHtml(site.site_id)}">${Loader.escapeHtml(site.title)}</span>`;
+          return `<button type="button" class="pill site ${active}" data-site="${Loader.escapeHtml(site.site_id)}" aria-pressed="${state.siteFilter === site.site_id}">${Loader.escapeHtml(site.title)}</button>`;
         });
         const allSitesActive = state.siteFilter === null ? 'active' : '';
-        const categoryButtons = categories.map((cat) => {
-          const active = state.categoryFilter === cat.name ? 'active' : '';
-          return `<span class="pill ${active}" data-kind="category" data-value="${Loader.escapeHtml(cat.name)}">${Loader.escapeHtml(cat.name)} (${cat.count})</span>`;
-        });
-        const allCategoriesActive = state.categoryFilter === null ? 'active' : '';
 
         filtersEl.innerHTML = `
-          <span class="pill site ${allSitesActive}" data-kind="site" data-value="">All sites</span>
+          <button type="button" class="pill site ${allSitesActive}" data-site="" aria-pressed="${state.siteFilter === null}">All sites</button>
           ${siteButtons.join('')}
-          <span class="pill ${allCategoriesActive}" data-kind="category" data-value="">All categories</span>
-          ${categoryButtons.join('')}
+          <button type="button" class="pill ${state.termFilter === null ? 'active' : ''}" id="all-terms" aria-pressed="${state.termFilter === null}">All topics</button>
         `;
 
-        filtersEl.querySelectorAll('.pill').forEach((el) => {
+        filtersEl.querySelectorAll('[data-site]').forEach((el) => {
           el.addEventListener('click', () => {
-            const kind = el.dataset.kind;
-            const value = el.dataset.value || null;
-            if (kind === 'site') state.siteFilter = value;
-            if (kind === 'category') state.categoryFilter = value;
-            renderFilters(sites, categories);
+            state.siteFilter = el.dataset.site || null;
+            renderFilters(sites, terms);
+            renderPosts();
+          });
+        });
+        document.getElementById('all-terms').addEventListener('click', () => {
+          state.termFilter = null;
+          renderFilters(sites, terms);
+          renderPosts();
+        });
+
+        const groups = new Map();
+        terms.forEach((term) => {
+          if (!groups.has(term.tag_group_name)) groups.set(term.tag_group_name, []);
+          groups.get(term.tag_group_name).push(term);
+        });
+        const menusEl = document.getElementById('term-menus');
+        menusEl.innerHTML = Array.from(groups, ([name, groupTerms]) => `
+          <details class="term-menu">
+            <summary class="pill">${Loader.escapeHtml(name)}</summary>
+            <div class="term-menu-list">
+              ${groupTerms.map((term) => `
+                <button type="button" data-term="${Loader.escapeHtml(term.name)}" aria-pressed="${state.termFilter === term.name}">${Loader.escapeHtml(term.name)} (${term.count})</button>
+              `).join('')}
+            </div>
+          </details>
+        `).join('');
+        menusEl.querySelectorAll('[data-term]').forEach((el) => {
+          el.addEventListener('click', () => {
+            state.termFilter = el.dataset.term;
+            renderFilters(sites, terms);
             renderPosts();
           });
         });
@@ -121,13 +185,18 @@
           return;
         }
 
-        contentEl.innerHTML = rows.map((row) => {
+        const termHeading = state.termFilter
+          ? `<h2 class="term-heading">${Loader.escapeHtml(state.termFilter)}</h2>`
+          : '';
+
+        contentEl.innerHTML = termHeading + rows.map((row) => {
           const image = firstImageSrc(row.content);
           const description = row.excerpt && row.excerpt.trim()
             ? row.excerpt
             : (row.content || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 160);
 
           return `
+          
             <article class="card">
               ${image ? `<img src="${Loader.escapeHtml(image)}" alt="" loading="lazy" />` : ''}
               <div class="badges"><span class="pill site">${Loader.escapeHtml(row.site_title)}</span></div>
@@ -155,17 +224,23 @@
           }
 
           const sites = rowsToObjects(db.exec('SELECT site_id, title FROM sites ORDER BY site_order'));
-          const categories = rowsToObjects(db.exec(`
-            SELECT t.name AS name, COUNT(DISTINCT pt.site_id || ':' || pt.post_id) AS count
-            FROM terms t
+          const terms = curation.applied ? rowsToObjects(db.exec(`
+            SELECT tg.tag_group_name, MIN(t.name) AS name,
+                   COUNT(DISTINCT pt.site_id || ':' || pt.post_id) AS count
+            FROM term_group tg
+            JOIN terms t ON t.site_id = tg.site_id AND t.term_id = tg.term_id
             JOIN post_terms pt ON pt.term_id = t.term_id AND pt.site_id = t.site_id AND pt.kind = t.kind
             JOIN posts p ON p.id = pt.post_id AND p.site_id = pt.site_id
-            WHERE t.kind = 'category' AND p.isPublic = 1
-            GROUP BY t.name
-            ORDER BY count DESC, t.name
-          `));
+            WHERE p.isPublic = 1
+            GROUP BY tg.tag_group_name, LOWER(t.name)
+            ORDER BY tg.tag_group_name, LOWER(t.name)
+          `)) : [];
+          if (!curation.applied && !curation.error) {
+            statusEl.textContent = 'Loaded site-cache.json, but curation.sql was not applied; topic menus are unavailable.';
+            statusEl.classList.add('error');
+          }
 
-          renderFilters(sites, categories);
+          renderFilters(sites, terms);
           renderPosts();
         } catch (error) {
           statusEl.textContent = `Failed to load data: ${error.message}`;
